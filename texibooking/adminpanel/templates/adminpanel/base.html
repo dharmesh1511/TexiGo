@@ -1,0 +1,705 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}TaxiGo Admin{% endblock %}</title>
+
+    <!-- Bootstrap -->
+    <link href="{% static 'adminpanel/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2563EB;
+            --primary-dark: #1D4ED8;
+            --primary-light: #DBEAFE;
+            --primary-green: #2563EB;
+            --dark-green: #1D4ED8;
+            --light-green: #2563EB;
+            --hover-green: #1E40AF;
+            --theme-black: #0F172A;
+            --theme-dark-gray: #1E293B;
+            --theme-light-gray: #F8FAFC;
+            --theme-border: #E2E8F0;
+            --sidebar-bg: #0F172A;
+            --sidebar-border: #1E293B;
+            --bg-slate: #F1F5F9;
+            --bs-warning: #2563EB;
+            --bs-warning-rgb: 37, 99, 235;
+            --bs-success: #2563EB;
+            --bs-success-rgb: 37, 99, 235;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--theme-light-gray);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--theme-dark-gray);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--theme-black);
+            letter-spacing: -0.02em;
+        }
+
+        /* Global Overrides for Buttons, Focus States & Badges */
+        .btn {
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+            min-height: 38px !important;
+            font-weight: 600 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Small buttons (Table actions, filter, edit, delete, view, map, close, back, cancel) */
+        .btn-sm,
+        .btn-action-sm,
+        .btn-action,
+        .btn-action-edit,
+        .btn-action-delete,
+        .admin-filter-btn {
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+            border-radius: 7px !important;
+            min-height: 34px !important;
+        }
+
+        /* Medium buttons (Save, Update, Search, Submit, Continue, Confirm, Calculate Route, Apply) */
+        .btn-md,
+        .btn-theme-primary,
+        .btn-theme-secondary,
+        .btn-premium-add,
+        .btn-custom-cancel,
+        .btn-custom-submit,
+        .btn-secondary-custom,
+        .btn-danger-custom {
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+            min-height: 38px !important;
+        }
+
+        /* Primary action buttons (Book Now, Login, Register, Admin Submit) */
+        .btn-lg,
+        .btn-primary-action,
+        .btn-login {
+            padding: 9px 18px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+            min-height: 40px !important;
+        }
+
+        /* Utility overrides when attached directly to buttons */
+        .btn.py-3,
+        .btn.py-4,
+        .btn.py-3\.5,
+        .btn.py-2\.5 {
+            padding-top: 9px !important;
+            padding-bottom: 9px !important;
+        }
+
+        .btn-sm.py-3,
+        .btn-sm.py-4,
+        .btn-sm.py-2\.5 {
+            padding-top: 6px !important;
+            padding-bottom: 6px !important;
+        }
+
+        .btn.px-5,
+        .btn.px-4 {
+            padding-left: 18px !important;
+            padding-right: 18px !important;
+        }
+
+        .btn-warning {
+            background-color: var(--primary-green) !important;
+            border-color: var(--primary-green) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.2);
+        }
+
+        .btn-warning:hover,
+        .btn-warning:focus,
+        .btn-warning:active {
+            background-color: var(--hover-green) !important;
+            border-color: var(--hover-green) !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+        }
+
+        .text-warning {
+            color: var(--primary-green) !important;
+        }
+
+        .bg-warning {
+            background-color: rgba(22, 163, 74, 0.1) !important;
+            color: var(--dark-green) !important;
+            border: 1px solid rgba(22, 163, 74, 0.2) !important;
+        }
+
+        .badge.bg-warning {
+            background-color: rgba(22, 163, 74, 0.1) !important;
+            color: var(--dark-green) !important;
+            border: 1px solid rgba(22, 163, 74, 0.2) !important;
+        }
+
+        .form-control:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-green) !important;
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15) !important;
+            outline: none !important;
+        }
+
+        .form-control,
+        select,
+        textarea {
+            border-radius: 10px;
+            border: 1px solid var(--theme-border);
+            transition: all 0.2s ease;
+        }
+
+        /* Modern Table styling globally */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+        }
+
+        .table {
+            border-color: var(--theme-border);
+            vertical-align: middle;
+            width: 100% !important;
+        }
+
+        .table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            padding: 12px 14px;
+        }
+
+        .table td {
+            padding: 14px 14px;
+            color: #334155;
+            font-size: 0.88rem;
+        }
+
+        /* Page-link global styling */
+        .page-item .page-link {
+            border: 1px solid var(--theme-border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: #4b5563;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary-green) !important;
+            border-color: var(--primary-green) !important;
+            color: #ffffff !important;
+        }
+
+        /* ==========================
+        SIDEBAR
+        ========================== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            overflow-y: auto;
+            border-right: 1px solid var(--sidebar-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1050;
+            box-shadow: 4px 0 24px rgba(15, 23, 42, 0.15);
+        }
+
+        .sidebar .logo {
+            height: 74px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0 24px;
+        }
+
+        .sidebar .logo .logo-long {
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar .logo .logo-long span {
+            color: var(--light-green);
+        }
+
+        .sidebar-links {
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar a,
+        .sidebar .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 12px;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .sidebar a i,
+        .sidebar .nav-link i {
+            font-size: 19px;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar a:hover,
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.07);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .sidebar a:hover i,
+        .sidebar .nav-link:hover i {
+            color: var(--light-green);
+        }
+
+        .sidebar a.active,
+        .sidebar .nav-link.active {
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.18) 0%, rgba(34, 197, 94, 0.05) 100%);
+            color: #ffffff;
+            font-weight: 700;
+            border-left: 4px solid var(--light-green);
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.15);
+        }
+
+        .sidebar a.active i,
+        .sidebar .nav-link.active i {
+            color: var(--light-green);
+        }
+
+        /* ==========================
+        TOPBAR
+        ========================== */
+        .topbar {
+            position: fixed;
+            left: 260px;
+            right: 0;
+            top: 0;
+            height: 74px;
+            background-color: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 35px;
+            border-bottom: 1px solid var(--theme-border);
+            z-index: 1040 !important;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .dropdown {
+            position: relative;
+            z-index: 1050;
+        }
+
+        .topbar h4 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: var(--theme-black);
+            font-size: 21px;
+            letter-spacing: -0.5px;
+        }
+
+        .profile-btn {
+            background-color: #ffffff;
+            border: 1px solid var(--theme-border);
+            color: var(--theme-dark-gray);
+            padding: 9px 18px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        .profile-btn:hover {
+            background-color: #f8fafc;
+            color: var(--theme-black);
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-btn i {
+            font-size: 18px;
+            color: var(--primary-green);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            z-index: 1060 !important;
+            border-radius: 14px !important;
+            border: 1px solid var(--theme-border) !important;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.15) !important;
+            padding: 8px !important;
+            margin-top: 10px !important;
+            animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #475569;
+            padding: 9px 16px !important;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+            color: var(--theme-black);
+        }
+
+        .dropdown-item.text-danger:hover {
+            background-color: #fef2f2;
+            color: #dc2626 !important;
+        }
+
+        /* ==========================
+        CONTENT
+        ========================== */
+        .content {
+            margin-left: 260px;
+            margin-top: 74px;
+            padding: 35px;
+            min-height: calc(100vh - 134px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ==========================
+        CARDS
+        ========================== */
+        .card {
+            border: 1px solid var(--theme-border);
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+            background-color: #ffffff;
+            transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+        }
+
+        .card-header {
+            border-radius: 16px 16px 0 0 !important;
+            border-bottom: 1px solid var(--theme-border);
+            background-color: #ffffff;
+            padding: 18px 24px;
+            font-weight: 700;
+        }
+
+        /* ==========================
+        FOOTER
+        ========================== */
+        .footer {
+            margin-left: 260px;
+            background-color: #ffffff;
+            text-align: center;
+            padding: 22px;
+            color: #64748b;
+            border-top: 1px solid var(--theme-border);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ==========================
+        SCROLLBAR
+        ========================== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--sidebar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-green);
+        }
+
+        /* ==========================
+        RESPONSIVE
+        ========================== */
+        @media (min-width: 992px) {
+            .sidebar {
+                width: 260px !important;
+                transform: none !important;
+                visibility: visible !important;
+            }
+
+            .topbar {
+                left: 260px;
+            }
+
+            .content {
+                margin-left: 260px;
+            }
+
+            .footer {
+                margin-left: 260px;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                width: 280px;
+            }
+
+            .topbar {
+                left: 0 !important;
+                padding: 0 20px;
+            }
+
+            .content {
+                margin-left: 0 !important;
+                padding: 20px;
+            }
+
+            .footer {
+                margin-left: 0 !important;
+            }
+        }
+    </style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "y21k5sm8xk");
+</script>
+
+</head>
+
+<body>
+
+    <!-- ================= Sidebar ================= -->
+    <div class="sidebar offcanvas offcanvas-lg offcanvas-start" id="sidebarMenu" aria-labelledby="sidebarMenuLabel"
+        tabindex="-1">
+
+        <div class="logo">
+            <span class="logo-long"><img src="{% static 'user/images/logo.png' %}" alt="TaxiGo Logo" height="34" style="object-fit: contain; margin-right: 8px; border-radius: 6px;"> Taxi<span>Go</span></span>
+            <!-- Close Button for Mobile view -->
+            <button type="button" class="btn-close btn-close-white d-lg-none ms-auto" data-bs-dismiss="offcanvas"
+                data-bs-target="#sidebarMenu" aria-label="Close"></button>
+        </div>
+
+        <div class="sidebar-links">
+            <a href="{% url 'admin_dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{% url 'user_list' %}"
+                class="{% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
+                <span>Users</span>
+            </a>
+
+            <a href="{% url 'driver_list' %}"
+                class="{% if request.resolver_match.url_name == 'driver_list' %}active{% endif %}">
+                <span>Drivers</span>
+            </a>
+
+            <a href="{% url 'vehicle_list' %}"
+                class="{% if request.resolver_match.url_name == 'vehicle_list' %}active{% endif %}">
+                <span>Vehicles</span>
+            </a>
+
+            <a href="{% url 'admin_bookings' %}"
+                class="{% if request.resolver_match.url_name == 'admin_bookings' %}active{% endif %}">
+                <span>Bookings</span>
+            </a>
+
+            <a href="{% url 'payment_dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'payment_dashboard' %}active{% endif %}">
+                <span>Payments</span>
+            </a>
+
+            <a href="{% url 'admin_analytics' %}"
+                class="{% if request.resolver_match.url_name == 'admin_analytics' %}active{% endif %}">
+                <span>Analytics</span>
+            </a>
+
+            <a href="{% url 'contact_messages' %}"
+                class="{% if request.resolver_match.url_name == 'contact_messages' %}active{% endif %}">
+                <span>Contact Messages</span>
+            </a>
+
+            <a href="{% url 'review_list' %}"
+                class="{% if request.resolver_match.url_name == 'review_list' %}active{% endif %}">
+                <span>Reviews</span>
+            </a>
+
+            <a href="{% url 'admin_logout' %}">
+                <span>Logout</span>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ================= Topbar ================= -->
+    <div class="topbar">
+
+        <div class="d-flex align-items-center gap-3">
+            <!-- Hamburger Menu Button (visible on mobile/tablet only) -->
+            <button class="btn p-0 border-0 d-lg-none" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle navigation">
+                <i class="bi bi-list fs-2 text-dark"></i>
+            </button>
+            <h4 class="m-0">
+                {% block page %}Dashboard{% endblock %}
+            </h4>
+        </div>
+
+        <div class="dropdown">
+
+            <button class="btn profile-btn dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle"></i>
+                {{ request.user.username }}
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 8px; margin-top: 10px;">
+
+                <li>
+                    <a class="dropdown-item py-2 px-3" href="{% url 'admin_profile' %}">
+                        <i class="bi bi-person me-2"></i>
+                        My Profile
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item py-2 px-3" href="#">
+                        <i class="bi bi-gear me-2"></i>
+                        Settings
+                    </a>
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <li>
+                    <a class="dropdown-item text-danger py-2 px-3" href="{% url 'admin_logout' %}">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Logout
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+    <!-- ================= Content ================= -->
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- ================= Footer ================= -->
+    <div class="footer">
+        © 2026 TaxiGo Admin Panel. All Rights Reserved.
+    </div>
+
+    <script src="{% static 'adminpanel/js/bootstrap.bundle.min.js' %}"></script>
+
+</body>
+
+</html>

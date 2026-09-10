@@ -1,0 +1,459 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block title %}
+About Us
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /*====================== ABOUT GLOBAL STYLE & CONFIG ======================*/
+    :root {
+        --theme-green: #2563EB;
+        --theme-green-hover: #1D4ED8;
+        --theme-black: #0F172A;
+        --theme-dark-gray: #0F172A;
+        --theme-light-gray: #F8FAFC;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+        --theme-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    /*====================== HERO ======================*/
+    .about-hero {
+        background:
+            radial-gradient(circle at 80% 20%, rgba(22, 163, 74, 0.15) 0%, rgba(17, 24, 39, 0) 50%),
+            linear-gradient(135deg, #0F172A 0%, #111827 100%);
+        padding: 90px 0 80px;
+        position: relative;
+        overflow: hidden;
+        color: #fff;
+    }
+    .about-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 52px;
+        font-weight: 800;
+        line-height: 1.2;
+        letter-spacing: -1.5px;
+        color: #fff;
+    }
+    .about-text {
+        color: #9CA3AF;
+        font-size: 17px;
+        line-height: 1.8;
+        margin-bottom: 35px;
+    }
+
+    .about-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 18px;
+        background: rgba(22, 163, 74, 0.12);
+        color: var(--light-green);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 22px;
+    }
+
+    .hero-img {
+        width: 100%;
+        max-width: 520px;
+        margin: auto;
+        animation: floatImage 4s ease-in-out infinite;
+        transition: all 0.3s ease;
+    }
+    @keyframes floatImage {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+    }
+    .hero-img:hover {
+        transform: scale(1.02);
+    }
+
+    /*====================== COMPANY ======================*/
+    .company-section {
+        padding: 80px 0;
+        background: #ffffff;
+    }
+    .section-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 38px;
+        font-weight: 800;
+        color: var(--theme-black);
+        letter-spacing: -1px;
+        margin-bottom: 16px;
+    }
+    .section-subtitle {
+        color: #6b7280;
+        font-size: 16px;
+        margin-top: 10px;
+    }
+    .company-section p {
+        color: #4b5563;
+        font-size: 15px;
+        line-height: 1.8;
+        margin-bottom: 20px;
+    }
+    .company-section img {
+        border-radius: 18px;
+        box-shadow: var(--theme-shadow-lg);
+        transition: all 0.3s ease;
+    }
+    .company-section img:hover {
+        transform: scale(1.02);
+    }
+
+    /*====================== MISSION ======================*/
+    .mission-section {
+        background: var(--theme-light-gray);
+        padding: 80px 0;
+    }
+    .info-card {
+        background: #ffffff;
+        border: 1px solid var(--theme-border);
+        border-radius: 18px;
+        padding: 36px 30px;
+        height: 100%;
+        box-shadow: var(--theme-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    .info-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 4px;
+        background: var(--theme-green);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    .info-card:hover::before {
+        transform: scaleX(1);
+    }
+    .info-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--theme-shadow-lg);
+        border-color: var(--theme-green);
+    }
+    .info-card h4 {
+        font-family: 'Poppins', sans-serif;
+        color: var(--theme-black);
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+    .info-card p {
+        color: #4b5563;
+        font-size: 15px;
+        line-height: 1.75;
+        margin: 0;
+    }
+    .icon-box {
+        width: 54px; height: 54px; border-radius: 12px;
+        background: rgba(22, 163, 74, 0.08); color: var(--theme-green);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px; margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    .info-card:hover .icon-box {
+        background: var(--theme-green);
+        color: #ffffff;
+    }
+
+    /*====================== WHY CHOOSE ======================*/
+    .choose-section {
+        background: #ffffff;
+        padding: 80px 0;
+    }
+    .choose-card {
+        background: #ffffff;
+        border: 1px solid var(--theme-border);
+        border-radius: 18px;
+        padding: 34px 26px;
+        text-align: center;
+        height: 100%;
+        box-shadow: var(--theme-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .choose-card:hover {
+        background: var(--theme-green);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(22, 163, 74, 0.2);
+        border-color: var(--theme-green);
+    }
+    .choose-icon {
+        width: 60px; height: 60px; border-radius: 50%;
+        margin: 0 auto 20px;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 24px;
+        color: var(--theme-green);
+        background: rgba(22, 163, 74, 0.08);
+        transition: all 0.3s ease;
+    }
+    .choose-card:hover .choose-icon {
+        background: #ffffff;
+        color: var(--theme-green);
+    }
+    .choose-card h5 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        color: var(--theme-black);
+        transition: all 0.3s ease;
+    }
+    .choose-card p {
+        color: #4b5563;
+        font-size: 14px;
+        line-height: 1.7;
+        margin: 0;
+        transition: all 0.3s ease;
+    }
+    .choose-card:hover h5,
+    .choose-card:hover p {
+        color: #ffffff;
+    }
+
+    /*====================== STATISTICS ======================*/
+    .stats-section {
+        background: #0B0F19;
+        padding: 70px 0;
+        color: #fff;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .stat-box h2 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 46px;
+        font-weight: 800;
+        color: var(--light-green);
+        margin-bottom: 6px;
+        letter-spacing: -1px;
+    }
+    .stat-box p {
+        color: #9CA3AF;
+        font-size: 15px;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    @media(max-width: 991.98px) {
+        .about-hero { padding: 60px 0; text-align: center; }
+        .about-title { font-size: 38px; }
+        .about-text { margin: 0 auto 30px; }
+        .hero-img { margin-top: 35px; max-width: 85%; }
+        .company-section { padding: 50px 0; text-align: center; }
+        .section-title { font-size: 30px; }
+        .company-section img { margin-bottom: 30px; }
+    }
+</style>
+
+<!--====================== HERO SECTION ======================-->
+<section class="about-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-lg-start text-center">
+                <span class="about-tag">
+                    ABOUT TAXIGO
+                </span>
+                <h1 class="about-title">
+                    Reliable & Comfortable Cab Service for Every Journey
+                </h1>
+                <p class="about-text">
+                    TaxiGo is a trusted cab booking platform dedicated to providing
+                    safe, affordable, and comfortable transportation services.
+                    We connect passengers with experienced drivers to deliver
+                    a smooth travel experience across cities.
+                </p>
+                <a href="{% url 'available_cars' %}" class="btn btn-warning btn-lg px-4">
+                    Book Your Ride
+                </a>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img src="{% static 'user/images/about.png' %}" class="img-fluid hero-img" alt="TaxiGo About banner">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--====================== COMPANY SECTION ======================-->
+<section class="company-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 text-center">
+                <img src="{% static 'user/images/about.png' %}" class="img-fluid rounded shadow" alt="TaxiGo Company Profile">
+            </div>
+            <div class="col-lg-6 text-lg-start text-center">
+                <h2 class="section-title">
+                    Who We Are
+                </h2>
+                <p>
+                    TaxiGo offers a simple and secure online taxi booking
+                    experience for passengers. Whether it's a local ride,
+                    airport transfer or long-distance travel, we ensure
+                    professional service with transparent pricing.
+                </p>
+                <p>
+                    Our focus is on customer satisfaction, driver safety,
+                    timely pickups and reliable transportation through
+                    modern technology.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--====================== MISSION SECTION ======================-->
+<section class="mission-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">
+                Our Core Values
+            </h2>
+            <p class="section-subtitle">
+                Building trust through quality service
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="info-card">
+                    <div class="icon-box">
+                        <i class="bi bi-compass"></i>
+                    </div>
+                    <h4>Our Mission</h4>
+                    <p>
+                        Provide safe, reliable and affordable transportation while delivering
+                        an excellent travel experience to every customer.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="info-card">
+                    <div class="icon-box">
+                        <i class="bi bi-eye"></i>
+                    </div>
+                    <h4>Our Vision</h4>
+                    <p>
+                        To become one of India's most trusted and technology-driven cab booking platforms.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="info-card">
+                    <div class="icon-box">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <h4>Our Values</h4>
+                    <p>
+                        Integrity, customer satisfaction, punctuality,
+                        transparency and professional service.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--====================== WHY CHOOSE SECTION ======================-->
+<section class="choose-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">
+                Why Choose TaxiGo
+            </h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="choose-card">
+                    <div class="choose-icon">
+                        <i class="bi bi-laptop"></i>
+                    </div>
+                    <h5>Easy Online Booking</h5>
+                    <p>
+                        Quick booking process with a user-friendly interface.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="choose-card">
+                    <div class="choose-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h5>Verified Drivers</h5>
+                    <p>
+                        Professional and experienced drivers for every trip.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="choose-card">
+                    <div class="choose-icon">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                    <h5>Affordable Pricing</h5>
+                    <p>
+                        Transparent pricing with no hidden charges.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="choose-card">
+                    <div class="choose-icon">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <h5>24/7 Availability</h5>
+                    <p>
+                        Book rides anytime with reliable customer support.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--====================== STATISTICS SECTION ======================-->
+<section class="stats-section">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-box">
+                    <h2>10K+</h2>
+                    <p>Happy Customers</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-box">
+                    <h2>500+</h2>
+                    <p>Professional Drivers</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-box">
+                    <h2>20K+</h2>
+                    <p>Completed Trips</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-box">
+                    <h2>99%</h2>
+                    <p>Customer Satisfaction</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

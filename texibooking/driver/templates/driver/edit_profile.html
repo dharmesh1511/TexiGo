@@ -1,0 +1,306 @@
+{% extends 'driver/base.html' %}
+{% load static %}
+
+{% block title %}
+Edit Driver Profile - TaxiGo
+{% endblock %}
+
+{% block content %}
+<style>
+    /*====================== EDIT DRIVER PROFILE SYSTEM ======================*/
+    :root {
+        --theme-green: #16A34A;
+        --theme-green-hover: #15803D;
+        --theme-black: #111827;
+        --theme-dark-gray: #1F2937;
+        --theme-light-gray: #F9FAFB;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 10px 30px rgba(17, 24, 39, 0.05);
+        --theme-shadow-lg: 0 20px 40px rgba(17, 24, 39, 0.08);
+    }
+
+    body {
+        background-color: var(--theme-light-gray);
+    }
+
+    .profile-wrapper {
+        padding: 40px 20px;
+    }
+
+    /* Common Card Styling */
+    .profile-card {
+        border: 1px solid var(--theme-border) !important;
+        border-radius: 18px !important;
+        box-shadow: var(--theme-shadow-lg) !important;
+        background-color: #ffffff;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .profile-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        padding: 40px;
+        color: #ffffff;
+    }
+    .profile-header h3 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
+        font-size: 24px;
+        margin-bottom: 6px;
+        letter-spacing: -0.5px;
+    }
+    .profile-header p {
+        font-size: 14px;
+        opacity: 0.7;
+    }
+
+    .profile-body {
+        padding: 40px;
+    }
+
+    /* Avatar photo preview */
+    .profile-image-container {
+        position: relative;
+        display: inline-block;
+    }
+    .profile-image {
+        width: 140px;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #ffffff;
+        box-shadow: var(--theme-shadow);
+        transition: all 0.3s ease;
+    }
+    .profile-image:hover {
+        transform: scale(1.03);
+        border-color: var(--theme-green);
+    }
+
+    /* Form Controls */
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        padding: 12px 16px;
+        border: 1.5px solid var(--theme-border);
+        background-color: #ffffff;
+        color: var(--theme-black);
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--theme-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12) !important;
+        outline: none !important;
+    }
+
+    input[readonly] {
+        background-color: var(--theme-light-gray) !important;
+        border-color: var(--theme-border) !important;
+        color: #6b7280 !important;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--theme-dark-gray);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* Buttons Override */
+    .update-btn {
+        background-color: var(--theme-green);
+        border: none;
+        color: #ffffff !important;
+        height: 54px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+        transition: all 0.2s ease;
+    }
+    .update-btn:hover {
+        background-color: var(--theme-green-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.25);
+    }
+
+    .input-group-lock {
+        display: flex;
+        align-items: stretch;
+    }
+    .input-group-lock .lock-text {
+        background-color: var(--theme-light-gray);
+        border: 1.5px solid var(--theme-border);
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        color: #9ca3af;
+    }
+    .input-group-lock input {
+        border-radius: 10px 0 0 10px !important;
+    }
+
+    /* Responsive Styling Adjustments */
+    @media (max-width: 767.98px) {
+        .profile-wrapper {
+            padding: 20px 10px;
+        }
+        .profile-header {
+            padding: 24px 20px;
+        }
+        .profile-header h3 {
+            font-size: 20px;
+        }
+        .profile-body {
+            padding: 24px 20px;
+        }
+        .update-btn {
+            height: 48px;
+            font-size: 15px;
+        }
+    }
+</style>
+
+<div class="profile-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-9 col-lg-11 col-12">
+                <div class="card profile-card">
+                    
+                    <!-- Header -->
+                    <div class="profile-header">
+                        <h3>
+                            <i class="bi bi-person-gear text-success me-1"></i> Edit Driver Profile
+                        </h3>
+                        <p class="mb-0">
+                            Update your personal information, address, and account details
+                        </p>
+                    </div>
+
+                    <div class="profile-body">
+
+
+                        <form method="POST" enctype="multipart/form-data" id="editDriverForm">
+                            {% csrf_token %}
+
+                            <!-- Profile Image Preview -->
+                            <div class="text-center mb-4">
+                                <div class="profile-image-container">
+                                    {% if driver.profile_image %}
+                                        <img src="{{ driver.profile_image.url }}" id="previewImage" class="profile-image shadow" alt="Profile Image">
+                                    {% else %}
+                                        <img src="{% static 'images/default-profile.png' %}" id="previewImage" class="profile-image shadow" alt="Default Profile">
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Upload Image Field -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="bi bi-image text-success me-1"></i> Profile Image
+                                </label>
+                                <input type="file" name="profile_image" id="imageInput" class="form-control">
+                            </div>
+
+                            <!-- Fields Row 1 -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6 col-12">
+                                    <label class="form-label">
+                                        <i class="bi bi-person text-success me-1"></i> Username
+                                    </label>
+                                    <input type="text" name="username" value="{{ request.user.username }}" class="form-control">
+                                </div>
+                                <div class="col-md-6 col-12">
+                                    <label class="form-label">
+                                        <i class="bi bi-envelope text-success me-1"></i> Email
+                                    </label>
+                                    <div class="input-group-lock">
+                                        <input type="email" value="{{ request.user.email }}" class="form-control" readonly>
+                                        <span class="lock-text"><i class="bi bi-lock-fill"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fields Row 2 -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6 col-12">
+                                    <label class="form-label">
+                                        <i class="bi bi-phone text-success me-1"></i> Mobile
+                                    </label>
+                                    <div class="input-group-lock">
+                                        <input type="text" value="{{ driver.mobile }}" class="form-control" readonly>
+                                        <span class="lock-text"><i class="bi bi-lock-fill"></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-12">
+                                    <label class="form-label">
+                                        <i class="bi bi-lock text-success me-1"></i> New Password
+                                    </label>
+                                    <input type="password" name="password" class="form-control" placeholder="Leave blank to keep old password">
+                                </div>
+                            </div>
+
+                            <!-- Fields Details Row 3 -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-person-vcard text-success me-1"></i> Full Name
+                                </label>
+                                {{ form.full_name }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-geo-alt text-success me-1"></i> Address
+                                </label>
+                                {{ form.address }}
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="bi bi-card-text text-success me-1"></i> License Number
+                                </label>
+                                {{ form.license_number }}
+                            </div>
+
+                            <!-- Submit button -->
+                            <button type="submit" class="btn update-btn w-100">
+                                <i class="bi bi-check-circle me-1"></i> Update Profile
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Class styling injects for Django form inputs
+        document.querySelectorAll("#editDriverForm input, #editDriverForm textarea").forEach(function(el){
+            if(!el.classList.contains("form-control") && el.type !== "file"){
+                el.classList.add("form-control");
+            }
+        });
+
+        // Live image previews
+        const imageInput = document.getElementById("imageInput");
+        const previewImage = document.getElementById("previewImage");
+        if(imageInput && previewImage){
+            imageInput.onchange = function(e){
+                const file = e.target.files[0];
+                if(file) previewImage.src = URL.createObjectURL(file);
+            }
+        }
+    });
+</script>
+{% endblock %}

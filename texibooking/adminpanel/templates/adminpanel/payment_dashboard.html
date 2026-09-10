@@ -1,0 +1,729 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Payment Dashboard - TaxiGo Admin
+{% endblock %}
+
+{% block content %}
+<!-- Google Fonts (Poppins & Inter) and Custom Premium Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Scoped Wrapper Styling */
+    .dashboard-wrapper {
+        font-family: 'Inter', sans-serif !important;
+        color: #1f2937;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Color Constants */
+    :root {
+        --theme-green: #16A34A;
+        --theme-green-hover: #15803D;
+        --theme-black: #111827;
+        --theme-dark-gray: #1F2937;
+        --theme-white: #ffffff;
+        --theme-gray-light: #f9fafb;
+        --theme-gray-border: #e5e7eb;
+    }
+
+    /* Page Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+    }
+
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.1s; }
+    .delay-3 { animation-delay: 0.15s; }
+
+    /* Custom Navigation Breadcrumbs */
+    .custom-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .custom-breadcrumb a {
+        color: var(--theme-green);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .custom-breadcrumb a:hover {
+        color: var(--theme-green-hover);
+    }
+
+    /* Page Header Section */
+    .header-section {
+        margin-bottom: 2rem;
+    }
+    .header-section h2 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        color: var(--theme-black);
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+    .header-section p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+        margin-top: 0.25rem;
+    }
+
+    /* KPI Stats Card Widgets */
+    .stat-card-premium {
+        background: var(--theme-white);
+        border: 1px solid var(--theme-gray-border);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .stat-card-premium:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -4px rgba(17, 24, 39, 0.08);
+        border-color: var(--theme-green);
+    }
+    .stat-card-premium .stat-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+    .stat-card-premium .stat-number {
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: var(--theme-black);
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+    .stat-icon-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+    .stat-card-premium:hover .stat-icon-box {
+        transform: scale(1.1);
+    }
+
+    /* Earning KPI Card */
+    .card-earning-dark {
+        background: linear-gradient(135deg, var(--theme-black) 0%, #1f2937 100%);
+        color: var(--theme-white) !important;
+        border: none;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        padding: 24px;
+        box-shadow: 0 10px 20px rgba(17, 24, 39, 0.12);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .card-earning-dark:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 28px rgba(17, 24, 39, 0.2);
+    }
+    .card-earning-dark::after {
+        content: "";
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        background: radial-gradient(circle, rgba(22, 163, 74, 0.25) 0%, rgba(22, 163, 74, 0) 70%);
+        top: -40px;
+        right: -40px;
+        pointer-events: none;
+    }
+    .card-earning-dark .stat-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        margin-bottom: 8px;
+    }
+    .card-earning-dark .stat-val {
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: var(--theme-white);
+        letter-spacing: -0.5px;
+    }
+    .card-earning-dark .stat-subtext {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-top: 4px;
+    }
+
+    .icon-box-green {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+    }
+    .icon-box-blue {
+        background-color: rgba(59, 130, 246, 0.08);
+        color: #3b82f6;
+    }
+    .icon-box-yellow {
+        background-color: rgba(245, 158, 11, 0.08);
+        color: #f59e0b;
+    }
+
+    /* Main Table Card */
+    .premium-card {
+        background: var(--theme-white);
+        border: 1px solid var(--theme-gray-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        overflow: hidden;
+    }
+    .premium-card-header {
+        background: #ffffff !important;
+        border-bottom: 1px solid var(--theme-gray-border) !important;
+        padding: 20px 24px;
+        border: none;
+    }
+    .premium-card-header h5 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--theme-black);
+    }
+
+    /* Toolbar Utilities */
+    .search-wrapper {
+        position: relative;
+        max-width: 320px;
+    }
+    .search-wrapper .bi-search {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.95rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+    .search-input-premium {
+        padding-left: 44px;
+        height: 44px;
+        border-radius: 10px;
+        border: 1.5px solid var(--theme-gray-border);
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background-color: var(--theme-gray-light);
+    }
+    .search-input-premium:focus {
+        background-color: var(--theme-white);
+        border-color: var(--theme-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+    }
+    .search-input-premium:focus + .bi-search {
+        color: var(--theme-green);
+    }
+
+    /* Premium Table layout */
+    .premium-table {
+        margin-bottom: 0;
+    }
+    .premium-table thead th {
+        background-color: var(--theme-gray-light);
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--theme-gray-border);
+    }
+    .premium-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid var(--theme-gray-border);
+    }
+    .premium-table tbody tr:hover {
+        background-color: rgba(22, 163, 74, 0.01) !important;
+    }
+    .premium-table td {
+        padding: 10px 8px;
+        color: #374151;
+        font-size: 0.875rem;
+        border: none;
+        vertical-align: middle;
+    }
+
+    /* User circular avatar tag */
+    .avatar-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(22, 163, 74, 0.08);
+        border: 1px solid rgba(22, 163, 74, 0.15);
+        color: var(--theme-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .amount-text {
+        font-weight: 700;
+        color: var(--theme-green);
+    }
+
+    /* Status badges */
+    .status-badge-paid {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+        border: 1px solid rgba(22, 163, 74, 0.15);
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 12px;
+        display: inline-block;
+    }
+
+    .status-badge-cash {
+        background-color: rgba(245, 158, 11, 0.08);
+        color: #d97706;
+        border: 1px solid rgba(245, 158, 11, 0.18);
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 12px;
+        display: inline-block;
+    }
+
+    .status-badge-online {
+        background-color: rgba(37, 99, 235, 0.08);
+        color: #2563eb;
+        border: 1px solid rgba(37, 99, 235, 0.18);
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 12px;
+        display: inline-block;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: all 0.2s ease;
+        margin: 0 2px;
+    }
+
+    .btn-action-delete {
+        background-color: rgba(239, 68, 68, 0.08);
+        color: #ef4444;
+    }
+
+    .btn-action-delete:hover {
+        background-color: #ef4444;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    /* Custom Confirm Modal styling */
+    .modal-confirm {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .modal-confirm .modal-header {
+        background: #fff;
+        border-bottom: none;
+        padding: 24px 24px 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .modal-confirm .icon-box {
+        width: 56px;
+        height: 56px;
+        background: #fee2e2;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        color: #ef4444;
+        font-size: 24px;
+    }
+
+    .modal-confirm .modal-body {
+        text-align: center;
+        padding: 8px 24px 24px;
+    }
+
+    .modal-confirm .modal-footer {
+        border-top: none;
+        padding: 0 24px 24px;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-secondary-custom {
+        background: #f3f4f6;
+        border: none;
+        color: #4b5563;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary-custom:hover {
+        background: #e5e7eb;
+        color: #1f2937;
+    }
+
+    .btn-danger-custom {
+        background: #ef4444;
+        border: none;
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .btn-danger-custom:hover {
+        background: #dc2626;
+        box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Footer styling */
+    .premium-card-footer {
+        background: var(--theme-white);
+        border-top: 1px solid var(--theme-gray-border);
+        padding: 20px 24px;
+    }
+</style>
+
+<div class="container-fluid py-2 dashboard-wrapper px-4">
+
+    <!-- Custom Navigation Breadcrumbs -->
+    <nav class="custom-breadcrumb animate-up" aria-label="breadcrumb">
+        <a href="{% url 'admin_dashboard' %}">Admin</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <span class="text-dark">Payment Dashboard</span>
+    </nav>
+
+    <!-- Page Header Section -->
+    <div class="header-section d-flex justify-content-between align-items-center animate-up delay-1">
+        <div>
+            <h2>💳 Payment Dashboard</h2>
+            <p>Monitor revenue streams, completed ride payments, and billing details</p>
+        </div>
+    </div>
+
+    <!-- Summary KPI Widgets Cards Grid -->
+    <div class="row g-4 mb-4 animate-up delay-2">
+        <!-- Revenue Card -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="card-earning-dark">
+                <div>
+                    <span class="stat-label">Total Revenue</span>
+                    <h3 class="stat-val mb-0 mt-2">₹ {{ total_revenue|floatformat:2 }}</h3>
+                </div>
+                <span class="stat-subtext">Overall cumulative earnings</span>
+            </div>
+        </div>
+
+        <!-- Total Payments -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="stat-card-premium">
+                <div>
+                    <div class="stat-title text-muted">Total Payments</div>
+                    <h3 class="stat-number text-dark">{{ total_payments }}</h3>
+                </div>
+                <div class="stat-icon-box icon-box-blue">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Rides -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="stat-card-premium">
+                <div>
+                    <div class="stat-title text-muted">Completed Rides</div>
+                    <h3 class="stat-number text-dark">{{ total_rides }}</h3>
+                </div>
+                <div class="stat-icon-box icon-box-yellow">
+                    <i class="bi bi-car-front-fill"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="stat-card-premium">
+                <div>
+                    <div class="stat-title text-muted">Monthly Revenue</div>
+                    <h3 class="stat-number text-dark">₹ {{ monthly_revenue|floatformat:2 }}</h3>
+                </div>
+                <div class="stat-icon-box icon-box-green">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Container -->
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show border-0 rounded-3 p-3 mb-0" style="background-color: rgba(22, 163, 74, 0.08); color: #16A34A;" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span class="small fw-semibold">{{ message }}</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Recent Payments Cards Table -->
+    <div class="card premium-card animate-up delay-3 border-0 mt-4">
+        <!-- Card Header Control Toolbar -->
+        <div class="premium-card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h5 class="mb-1">Recent Payments</h5>
+                <p class="text-muted mb-0 small">Latest successful transaction history logs</p>
+            </div>
+            <div class="search-wrapper w-100 w-sm-50">
+                <input type="text"
+                       id="searchInput"
+                       class="form-control search-input-premium"
+                       placeholder="Filter by customer, driver, method, status...">
+                <i class="bi bi-search"></i>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            {% if recent_payments %}
+                <div class="table-responsive">
+                    <table class="table premium-table align-middle text-center" id="paymentsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>Customer</th>
+                                <th>Driver</th>
+                                <th>Vehicle</th>
+                                <th>Amount</th>
+                                <th style="width: 140px;">Method</th>
+                                <th style="width: 130px;">Status</th>
+                                <th style="width: 180px;">Payment Date</th>
+                                <th style="width: 90px;" class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in recent_payments %}
+                                <tr>
+                                    <td class="fw-medium text-secondary">{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="avatar-wrapper justify-content-center">
+                                            <div class="avatar-circle">
+                                                {{ payment.booking.user.username|first|upper }}
+                                            </div>
+                                            <div class="text-start">
+                                                <span class="d-block fw-bold text-dark">{{ payment.booking.user.username }}</span>
+                                                <small class="text-muted">Customer</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark">{{ payment.booking.vehicle.driver.full_name }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-semibold text-dark">{{ payment.booking.vehicle.company_name }}</span>
+                                        <br>
+                                        <small class="text-muted">{{ payment.booking.vehicle.car_model }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="amount-text">₹ {{ payment.amount|floatformat:2 }}</span>
+                                    </td>
+                                    <td>
+                                        {% if payment.payment_method == "Cash" %}
+                                            <span class="status-badge-cash">
+                                                <i class="bi bi-cash-stack me-1"></i> Cash
+                                            </span>
+                                        {% else %}
+                                            <span class="status-badge-online">
+                                                <i class="bi bi-credit-card-fill me-1"></i> Online
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="status-badge-paid">
+                                            <i class="bi bi-check-circle-fill me-1"></i> {{ payment.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium text-dark">{{ payment.created_at|date:"d M Y" }}</span>
+                                        <br>
+                                        <small class="text-muted">{{ payment.created_at|time:"h:i A" }}</small>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="#"
+                                           class="btn-action btn-action-delete text-decoration-none delete-trigger"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#deleteConfirmModal"
+                                           data-payment-id="{{ payment.id }}"
+                                           data-payment-user="{{ payment.booking.user.username }}"
+                                           data-payment-amount="{{ payment.amount|floatformat:2 }}"
+                                           data-delete-url="{% url 'delete_payment' payment.id %}"
+                                           title="Delete Payment">
+                                            <i class="bi bi-trash3"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            <!-- Empty Search Row Placeholder -->
+                            <tr id="noResultsRow" style="display: none;">
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-search mb-3 text-secondary" style="font-size: 2.5rem; display: block;"></i>
+                                        <h5 class="fw-bold text-dark">No matching transactions found</h5>
+                                        <p class="small mb-0">Try double-checking spelling or filter keywords</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-wallet2 mb-2 text-secondary" style="font-size: 2.5rem; display: block;"></i>
+                    <h5 class="fw-bold text-dark">No Payments Found</h5>
+                    <p class="small mb-0">Payment logs will display here once transactions succeed</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<!-- Custom Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-confirm border-0 shadow">
+            <div class="modal-header">
+                <div class="icon-box">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h5 class="modal-title fw-bold text-dark w-100" id="deleteConfirmModalLabel">Delete Payment Record?</h5>
+            </div>
+            <div class="modal-body text-muted">
+                <p class="mb-0">Are you sure you want to permanently delete payment record <strong id="modalPaymentId" class="text-dark"></strong> of <strong id="modalPaymentAmount" class="text-dark"></strong> for customer <strong id="modalPaymentUser" class="text-dark"></strong>?</p>
+                <p class="small text-danger mt-2 mb-0"><i class="bi bi-info-circle-fill me-1"></i> This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Cancel</button>
+                <a id="modalConfirmDeleteBtn" href="#" class="btn btn-danger-custom text-decoration-none">Delete Payment</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Delete Modal confirmation binding
+    const deleteTriggers = document.querySelectorAll(".delete-trigger");
+    const modalPaymentId = document.getElementById("modalPaymentId");
+    const modalPaymentUser = document.getElementById("modalPaymentUser");
+    const modalPaymentAmount = document.getElementById("modalPaymentAmount");
+    const modalConfirmDeleteBtn = document.getElementById("modalConfirmDeleteBtn");
+
+    deleteTriggers.forEach(trigger => {
+        trigger.addEventListener("click", function () {
+            const paymentId = this.getAttribute("data-payment-id");
+            const paymentUser = this.getAttribute("data-payment-user");
+            const paymentAmount = this.getAttribute("data-payment-amount");
+            const deleteUrl = this.getAttribute("data-delete-url");
+
+            if (modalPaymentId) modalPaymentId.textContent = "#" + paymentId;
+            if (modalPaymentUser) modalPaymentUser.textContent = paymentUser;
+            if (modalPaymentAmount) modalPaymentAmount.textContent = "₹ " + paymentAmount;
+            if (modalConfirmDeleteBtn) modalConfirmDeleteBtn.setAttribute("href", deleteUrl);
+        });
+    });
+
+    // Instant Interactive Search Filtering
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function() {
+            let value = this.value.toLowerCase().trim();
+            let rows = document.querySelectorAll("#paymentsTable tbody tr:not(#noResultsRow)");
+            let matches = 0;
+
+            rows.forEach(function(row) {
+                let text = row.innerText.toLowerCase();
+                if (text.includes(value)) {
+                    row.style.display = "";
+                    matches++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            let noResultsRow = document.getElementById("noResultsRow");
+            if (noResultsRow) {
+                noResultsRow.style.display = (matches === 0 && rows.length > 0) ? "" : "none";
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

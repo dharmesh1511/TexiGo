@@ -1,0 +1,244 @@
+{% extends "user/base.html" %}
+
+{% block title %}Rate & Write Review | TexiBooking{% endblock %}
+
+{% block content %}
+<style>
+    .review-form-card {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .review-form-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #ffffff;
+        padding: 30px;
+    }
+
+    .trip-summary-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 18px 20px;
+        margin-bottom: 24px;
+    }
+
+    .star-rating-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+
+    .interactive-star {
+        font-size: 2.5rem;
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: all 0.18s ease-in-out;
+        user-select: none;
+    }
+
+    .interactive-star:hover,
+    .interactive-star.hovered,
+    .interactive-star.selected {
+        color: #f59e0b;
+        transform: scale(1.18);
+    }
+
+    .rating-feedback-badge {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #d97706;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        padding: 6px 16px;
+        border-radius: 50px;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="review-form-card">
+
+                <!-- HEADER -->
+                <div class="review-form-header text-center">
+                    <span
+                        class="badge rounded-pill px-3 py-1 fs-7 fw-bold mb-2"
+                        style="background: rgba(255, 255, 255, 0.18) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;">
+                        <i class="bi bi-star-fill me-1 text-warning"></i> TRIP FEEDBACK
+                    </span>
+                    <h3 class="fw-bold mb-1 text-white">How was your ride experience?</h3>
+                    <p class="text-slate-300 opacity-75 mb-0 fs-6">Your honest review helps us improve service quality
+                        for everyone.</p>
+                </div>
+
+                <div class="p-4 p-md-5">
+
+                    <!-- TRIP RECAP CARD -->
+                    <div class="trip-summary-box">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                            <span class="badge bg-success text-white px-3 py-1 rounded-pill fs-8">
+                                <i class="bi bi-check-circle-fill me-1"></i> Ride Completed
+                            </span>
+                            <span class="fs-8 text-muted fw-semibold">Booking #{{ booking.id }}</span>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <div class="fs-7 text-muted">Vehicle</div>
+                                <div class="fw-bold text-dark fs-6">
+                                    <i class="bi bi-car-front text-success me-1"></i>
+                                    {{ booking.vehicle.company_name }} {{ booking.vehicle.car_model }}
+                                </div>
+                            </div>
+                            {% if booking.vehicle.driver %}
+                            <div class="col-sm-6">
+                                <div class="fs-7 text-muted">Driver</div>
+                                <div class="fw-bold text-dark fs-6">
+                                    <i class="bi bi-person-badge text-primary me-1"></i>
+                                    {{ booking.vehicle.driver.full_name }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="col-12 mt-2">
+                                <div class="fs-7 text-muted d-flex align-items-center gap-2">
+                                    <span><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ booking.pickup_location }}</span>
+                                    <span>➔</span>
+                                    <span><i class="bi bi-geo-alt-fill text-success me-1"></i>{{ booking.drop_location }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FORM -->
+                    <form method="POST" id="reviewSubmitForm">
+                        {% csrf_token %}
+
+                        <!-- INTERACTIVE STAR RATING PICKER -->
+                        <div class="mb-3 text-center">
+                            <label class="form-label fw-bold text-dark fs-6 mb-2">Select Rating</label>
+
+                            <div class="star-rating-container justify-content-center" id="starContainer">
+                                <i class="bi bi-star-fill interactive-star" data-value="1"></i>
+                                <i class="bi bi-star-fill interactive-star" data-value="2"></i>
+                                <i class="bi bi-star-fill interactive-star" data-value="3"></i>
+                                <i class="bi bi-star-fill interactive-star" data-value="4"></i>
+                                <i class="bi bi-star-fill interactive-star" data-value="5"></i>
+                            </div>
+
+                            <div class="rating-feedback-badge" id="ratingFeedbackLabel">
+                                Select 1 to 5 stars above
+                            </div>
+
+                            <!-- HIDDEN OR CUSTOM STYLED RATING FIELD (SYNCED WITH FORM) -->
+                            <div class="d-none">
+                                {{ form.rating }}
+                            </div>
+                        </div>
+
+                        <!-- COMMENT FIELD -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <label for="{{ form.comment.id_for_label }}"
+                                    class="form-label fw-bold text-dark mb-0 fs-6">Your Experience & Feedback</label>
+                                <span class="fs-8 text-muted" id="charCounter">0 / 500 characters</span>
+                            </div>
+
+                            {{ form.comment }}
+
+                            {% if form.comment.errors %}
+                            <div class="text-danger fs-7 mt-1">{{ form.comment.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="d-flex align-items-center gap-3 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg rounded-pill px-4 flex-grow-1 fw-bold">
+                                <i class="bi bi-send-fill me-2"></i> Submit Review
+                            </button>
+                            <a href="{% url 'my_bookings' %}" class="btn btn-light btn-lg rounded-pill px-4 border">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- INTERACTIVE STAR PICKER JS -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const stars = document.querySelectorAll(".interactive-star");
+        const ratingSelect = document.getElementById("{{ form.rating.id_for_label }}");
+        const feedbackLabel = document.getElementById("ratingFeedbackLabel");
+        const commentBox = document.getElementById("{{ form.comment.id_for_label }}");
+        const charCounter = document.getElementById("charCounter");
+
+        const feedbackTexts = {
+            1: "⭐ 1/5 - Poor Experience",
+            2: "⭐⭐ 2/5 - Below Expectation",
+            3: "⭐⭐⭐ 3/5 - Average Ride",
+            4: "⭐⭐⭐⭐ 4/5 - Very Good!",
+            5: "⭐⭐⭐⭐⭐ 5/5 - Outstanding Experience!"
+        };
+
+        // Initialize default rating if already selected
+        let initialVal = ratingSelect ? parseInt(ratingSelect.value) || 5 : 5;
+        setSelectedRating(initialVal);
+
+        stars.forEach(star => {
+            star.addEventListener("mouseover", function () {
+                let val = parseInt(this.getAttribute("data-value"));
+                highlightStars(val);
+            });
+
+            star.addEventListener("mouseout", function () {
+                let currentVal = ratingSelect ? parseInt(ratingSelect.value) || 0 : 0;
+                highlightStars(currentVal);
+            });
+
+            star.addEventListener("click", function () {
+                let val = parseInt(this.getAttribute("data-value"));
+                setSelectedRating(val);
+            });
+        });
+
+        function setSelectedRating(val) {
+            if (ratingSelect) {
+                ratingSelect.value = val;
+            }
+            highlightStars(val);
+            if (feedbackLabel && feedbackTexts[val]) {
+                feedbackLabel.innerText = feedbackTexts[val];
+            }
+        }
+
+        function highlightStars(val) {
+            stars.forEach(s => {
+                let sVal = parseInt(s.getAttribute("data-value"));
+                if (sVal <= val) {
+                    s.classList.add("selected");
+                } else {
+                    s.classList.remove("selected");
+                }
+            });
+        }
+
+        // Character counter for comment
+        if (commentBox && charCounter) {
+            commentBox.addEventListener("input", function () {
+                let len = this.value.length;
+                charCounter.innerText = `${len} / 500 characters`;
+            });
+        }
+    });
+</script>
+{% endblock %}

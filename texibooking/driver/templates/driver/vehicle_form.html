@@ -1,0 +1,382 @@
+{% extends 'driver/base.html' %}
+
+{% block title %}Vehicle Details - TaxiGo{% endblock %}
+
+{% block content %}
+<!-- Google Fonts (Poppins) and Custom Premium Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Scoped Wrapper Styling */
+    .dashboard-wrapper {
+        font-family: 'Poppins', sans-serif !important;
+        color: #111827;
+    }
+
+    /* Color Constants */
+    :root {
+        --theme-green: #16A34A;
+        --theme-green-hover: #15803D;
+        --theme-black: #111827;
+        --theme-dark-gray: #1F2937;
+        --theme-light-gray: #F9FAFB;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 10px 30px rgba(17, 24, 39, 0.05);
+        --theme-shadow-lg: 0 20px 40px rgba(17, 24, 39, 0.08);
+    }
+
+    /* Page Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.1s; }
+
+    /* Custom Breadcrumbs */
+    .custom-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .custom-breadcrumb a {
+        color: var(--theme-green);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .custom-breadcrumb a:hover {
+        color: #15803d;
+    }
+
+    /* Page Header */
+    .header-section {
+        margin-bottom: 2rem;
+    }
+    .header-section h2 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        color: var(--theme-black);
+        margin: 0;
+    }
+    .header-section p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+        margin-top: 0.25rem;
+    }
+
+    /* Card Styling */
+    .premium-card {
+        background: #ffffff;
+        border: 1px solid var(--theme-border) !important;
+        border-radius: 18px !important;
+        box-shadow: var(--theme-shadow-lg) !important;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .premium-card:hover {
+        transform: translateY(-4px);
+    }
+    .premium-card-header {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;
+        padding: 20px 24px !important;
+        border-bottom: 1px solid var(--theme-border) !important;
+    }
+    .premium-card-header h5 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff !important;
+        margin: 0;
+    }
+
+    /* Form Inputs Custom Styling */
+    .premium-form-card label {
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--theme-dark-gray);
+        margin-bottom: 8px;
+        display: inline-block;
+    }
+
+    .premium-form-card .form-control,
+    .premium-form-card select,
+    .premium-form-card textarea {
+        display: block;
+        width: 100%;
+        height: 48px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--theme-black);
+        background-color: #ffffff;
+        border: 1.5px solid var(--theme-border);
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .premium-form-card .form-control:focus,
+    .premium-form-card select:focus,
+    .premium-form-card textarea:focus {
+        background-color: #ffffff;
+        border-color: var(--theme-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12) !important;
+        outline: none;
+    }
+
+    /* Custom File Input Padding */
+    .premium-form-card input[type="file"] {
+        padding: 10px 12px;
+        height: auto;
+    }
+
+    /* Error Handling styling */
+    .errorlist {
+        list-style: none;
+        color: #dc2626;
+        padding-left: 0;
+        font-size: 0.775rem;
+        font-weight: 600;
+        margin-top: 6px;
+        margin-bottom: 0;
+    }
+    .errorlist li::before {
+        content: "\F33A"; /* Bootstrap Icon for exclamation-circle-fill */
+        font-family: "bootstrap-icons";
+        margin-right: 6px;
+        color: #dc2626;
+    }
+
+    /* Buttons Override */
+    .btn-theme-primary {
+        background: var(--theme-green);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 8px 16px;
+        font-size: 14px;
+        min-height: 38px;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 10px rgba(22, 163, 74, 0.15);
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-theme-primary:hover {
+        background: var(--theme-green-hover);
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 14px rgba(22, 163, 74, 0.25);
+    }
+
+    .btn-theme-secondary {
+        background: #374151;
+        color: #ffffff !important;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 8px 16px;
+        font-size: 14px;
+        min-height: 38px;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 10px rgba(55, 65, 81, 0.15);
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .btn-theme-secondary:hover {
+        background: var(--theme-black);
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 14px rgba(17, 24, 39, 0.2);
+    }
+
+    /* Responsive Styling Adjustments */
+    @media (max-width: 991.98px) {
+        .dashboard-wrapper {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+    }
+    
+    @media (max-width: 767.98px) {
+        .header-section {
+            margin-bottom: 1.5rem;
+        }
+        .header-section h2 {
+            font-size: 1.5rem;
+        }
+        .header-section p {
+            font-size: 0.85rem;
+        }
+        .premium-card-header {
+            padding: 16px 20px !important;
+        }
+        .premium-card-header h5 {
+            font-size: 15px;
+        }
+        .btn-theme-primary, .btn-theme-secondary {
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            width: 100%;
+            justify-content: center;
+        }
+        .d-flex.gap-3 {
+            flex-direction: column;
+            gap: 10px !important;
+        }
+    }
+</style>
+
+<div class="container-fluid py-3 dashboard-wrapper px-4">
+
+    <!-- Breadcrumb -->
+    <nav class="custom-breadcrumb animate-up" aria-label="breadcrumb">
+        <a href="{% url 'driver_dashboard' %}">Dashboard</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <a href="{% url 'driver_vehicle_list' %}">My Garage</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <span class="text-dark">
+            {% if form.instance.pk %}
+                Edit Vehicle
+            {% else %}
+                Add Vehicle
+            {% endif %}
+        </span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="header-section animate-up delay-1">
+        <h2>
+            {% if form.instance.pk %}
+                ✏️ Edit Vehicle Details
+            {% else %}
+                🚗 Register New Vehicle
+            {% endif %}
+        </h2>
+        <p>Ensure all specifications match your vehicle registration documents</p>
+    </div>
+
+    <!-- Form Section -->
+    <div class="row justify-content-center animate-up delay-2">
+        <div class="col-xl-9 col-lg-11 col-12">
+
+            <div class="card premium-card premium-form-card border-0">
+                <!-- Card Header -->
+                <div class="premium-card-header d-flex align-items-center">
+                    <i class="bi bi-file-earmark-text-fill me-2 fs-5 text-success"></i>
+                    <h5>Vehicle Details Form</h5>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4 p-lg-5">
+                    <form method="POST" enctype="multipart/form-data" id="vehicleForm">
+                        {% csrf_token %}
+
+                        <div class="row g-4">
+                            <!-- Company Name -->
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Company Name</label>
+                                {{ form.company_name }}
+                            </div>
+
+                            <!-- Car Model -->
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Car Model</label>
+                                {{ form.car_model }}
+                            </div>
+
+                            <!-- Vehicle Number -->
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Vehicle Number</label>
+                                {{ form.vehicle_number }}
+                            </div>
+
+                            <!-- Vehicle Color -->
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Vehicle Color</label>
+                                {{ form.vehicle_color }}
+                            </div>
+
+                            <!-- Seating Capacity -->
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Seating Capacity</label>
+                                {{ form.seating_capacity }}
+                            </div>
+
+                            <!-- Price Per KM -->
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Price Per KM (₹)</label>
+                                {{ form.price_per_km }}
+                            </div>
+
+                            <!-- Registration Number -->
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Registration Number</label>
+                                {{ form.registration_number }}
+                            </div>
+
+                            <!-- Insurance Number -->
+                            <div class="col-md-6 col-12">
+                                <label class="form-label">Insurance Number</label>
+                                {{ form.insurance_number }}
+                            </div>
+
+                            <!-- Car Image -->
+                            <div class="col-12">
+                                <label class="form-label">Car Image</label>
+                                {{ form.car_image }}
+
+                                {% if form.instance.car_image %}
+                                    <div class="mt-4 p-3 bg-light rounded-3 d-inline-block border border-dashed text-center">
+                                        <span class="text-muted small fw-semibold d-block mb-2">Registered Image Preview</span>
+                                        <img src="{{ form.instance.car_image.url }}"
+                                             class="rounded shadow-sm"
+                                             style="max-width: 250px; height: auto; border: 1px solid var(--theme-border); background-color: #ffffff; padding: 6px;"
+                                             alt="Car Image">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-5 pt-3 border-top d-flex gap-3">
+                            <button type="submit" class="btn btn-theme-primary">
+                                <i class="bi bi-floppy-fill me-2"></i> Save Vehicle
+                            </button>
+
+                            <a href="{% url 'driver_vehicle_list' %}" class="btn btn-theme-secondary">
+                                <i class="bi bi-arrow-left me-2"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("#vehicleForm input, #vehicleForm select, #vehicleForm textarea").forEach(function(el){
+            if(!el.classList.contains("form-control") && el.type !== "file"){
+                el.classList.add("form-control");
+            }
+        });
+    });
+</script>
+{% endblock %}

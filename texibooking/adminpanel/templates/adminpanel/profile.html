@@ -1,0 +1,240 @@
+{% extends 'adminpanel/base.html' %}
+
+{% block title %}
+Admin Profile - TaxiGo Admin
+{% endblock %}
+
+{% block page %}My Profile{% endblock %}
+
+{% block content %}
+<!-- Google Fonts (Poppins & Inter) and Custom Premium Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Scoped Wrapper Styling */
+    .dashboard-wrapper {
+        font-family: 'Inter', sans-serif !important;
+        color: #1f2937;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Color Constants */
+    :root {
+        --theme-green: #16A34A;
+        --theme-green-hover: #15803D;
+        --theme-black: #111827;
+        --theme-dark-gray: #1F2937;
+        --theme-light-gray: #F9FAFB;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 10px 30px rgba(17, 24, 39, 0.05);
+        --theme-shadow-lg: 0 20px 40px rgba(17, 24, 39, 0.08);
+    }
+
+    /* Page Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+    }
+
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.1s; }
+
+    /* Custom Navigation Breadcrumbs */
+    .custom-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .custom-breadcrumb a {
+        color: var(--theme-green);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .custom-breadcrumb a:hover {
+        color: var(--theme-green-hover);
+    }
+
+    /* Common Card Styling */
+    .profile-card {
+        border: 1px solid var(--theme-border) !important;
+        border-radius: 18px !important;
+        box-shadow: var(--theme-shadow-lg) !important;
+        background-color: #ffffff;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .profile-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        padding: 40px;
+        color: #ffffff;
+        text-align: center;
+    }
+
+    .profile-header h3 {
+        font-weight: 800;
+        font-size: 24px;
+        margin-top: 15px;
+        margin-bottom: 4px;
+        letter-spacing: -0.5px;
+        color: #fff;
+    }
+    .profile-header p {
+        font-size: 14px;
+        opacity: 0.7;
+        margin-bottom: 0;
+    }
+
+    .avatar-placeholder {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: var(--theme-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 38px;
+        margin: 0 auto;
+    }
+
+    .profile-body {
+        padding: 40px;
+    }
+
+    /* Key Value Grid */
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--theme-border);
+        font-size: 14px;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    .info-row .lbl {
+        color: #6b7280;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .info-row .val {
+        color: var(--theme-black);
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .badge-admin {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+        border: 1px solid rgba(22, 163, 74, 0.15);
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 12px;
+        display: inline-block;
+    }
+
+    .btn-secondary {
+        background-color: #374151;
+        border: none;
+        color: #ffffff !important;
+        border-radius: 10px;
+        padding: 12px 24px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px rgba(55, 65, 81, 0.15);
+    }
+    .btn-secondary:hover {
+        background-color: var(--theme-black);
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 14px rgba(17, 24, 39, 0.2);
+    }
+</style>
+
+<div class="container-fluid py-2 dashboard-wrapper px-4">
+
+    <!-- Custom Navigation Breadcrumbs -->
+    <nav class="custom-breadcrumb animate-up" aria-label="breadcrumb">
+        <a href="{% url 'admin_dashboard' %}">Admin</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <span class="text-dark">My Profile</span>
+    </nav>
+
+    <div class="row justify-content-center animate-up delay-1 mt-4">
+        <div class="col-xl-7 col-lg-9 col-12">
+            <div class="card profile-card border-0">
+                
+                <!-- Header -->
+                <div class="profile-header">
+                    <div class="avatar-placeholder">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <h3>{{ admin.username }}</h3>
+                    <p>System Administrator</p>
+                </div>
+
+                <!-- Body -->
+                <div class="profile-body">
+                    <div class="mb-4">
+                        <div class="info-row">
+                            <span class="lbl"><i class="bi bi-person text-success"></i> Username</span>
+                            <span class="val">{{ admin.username }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="lbl"><i class="bi bi-envelope text-success"></i> Email</span>
+                            <span class="val">{{ admin.email }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="lbl"><i class="bi bi-calendar-event text-success"></i> Date Joined</span>
+                            <span class="val">{{ admin.date_joined|date:"d M Y, h:i A" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="lbl"><i class="bi bi-clock-history text-success"></i> Last Login</span>
+                            <span class="val">{{ admin.last_login|date:"d M Y, h:i A" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="lbl"><i class="bi bi-shield-check text-success"></i> System Role</span>
+                            <span class="val"><span class="badge-admin">Administrator</span></span>
+                        </div>
+                    </div>
+
+                    <div class="text-start border-top pt-4">
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

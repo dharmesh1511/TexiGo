@@ -1,0 +1,972 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        Driver Panel
+        {% endblock %}
+    </title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{% static 'user/css/bootstrap.min.css' %}">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <style>
+        :root {
+            --primary: #2563EB;
+            --primary-dark: #1D4ED8;
+            --primary-light: #DBEAFE;
+            --primary-green: #2563EB;
+            --dark-green: #1D4ED8;
+            --light-green: #2563EB;
+            --hover-green: #1E40AF;
+            --theme-black: #0F172A;
+            --theme-dark-gray: #1E293B;
+            --theme-light-gray: #F8FAFC;
+            --theme-border: #E2E8F0;
+            --sidebar-bg: #0F172A;
+            --sidebar-border: #1E293B;
+            --bg-slate: #F1F5F9;
+            --bs-warning: #2563EB;
+            --bs-warning-rgb: 37, 99, 235;
+            --bs-success: #2563EB;
+            --bs-success-rgb: 37, 99, 235;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--theme-light-gray);
+            color: var(--theme-dark-gray);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--theme-black);
+            letter-spacing: -0.02em;
+        }
+
+        /* Global Overrides for Buttons, Focus States & Badges */
+        .btn {
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+            min-height: 38px !important;
+            font-weight: 600 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Small buttons (Table actions, filter, edit, delete, view, map, close, back, cancel) */
+        .btn-sm,
+        .btn-action-sm,
+        .btn-action-edit,
+        .btn-action-delete,
+        .btn-action-accept,
+        .btn-action-reject,
+        .btn-action-complete,
+        .btn-header-link {
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+            border-radius: 7px !important;
+            min-height: 34px !important;
+        }
+
+        /* Medium buttons (Save, Update, Search, Submit, Continue, Confirm, Calculate Route, Apply) */
+        .btn-md,
+        .btn-theme-primary,
+        .btn-theme-secondary {
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+            min-height: 38px !important;
+        }
+
+        /* Primary action buttons (Book Now, Login, Register, Submit Form, Accept/Complete Ride) */
+        .btn-lg,
+        .btn-primary-action,
+        .btn-green-lg,
+        .btn-outline-light-lg,
+        .btn-dark-lg,
+        .tg-login-btn {
+            padding: 9px 18px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+            min-height: 40px !important;
+        }
+
+        /* Utility overrides when attached directly to buttons */
+        .btn.py-3,
+        .btn.py-4,
+        .btn.py-3\.5,
+        .btn.py-2\.5 {
+            padding-top: 9px !important;
+            padding-bottom: 9px !important;
+        }
+
+        .btn-sm.py-3,
+        .btn-sm.py-4,
+        .btn-sm.py-2\.5 {
+            padding-top: 6px !important;
+            padding-bottom: 6px !important;
+        }
+
+        .btn.px-5,
+        .btn.px-4 {
+            padding-left: 18px !important;
+            padding-right: 18px !important;
+        }
+
+        .btn-warning {
+            background-color: var(--primary-green) !important;
+            border-color: var(--primary-green) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.2);
+        }
+
+        .btn-warning:hover,
+        .btn-warning:focus,
+        .btn-warning:active {
+            background-color: var(--hover-green) !important;
+            border-color: var(--hover-green) !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
+        }
+
+        .text-warning {
+            color: var(--primary-green) !important;
+        }
+
+        .bg-warning {
+            background-color: rgba(22, 163, 74, 0.1) !important;
+            color: var(--dark-green) !important;
+            border: 1px solid rgba(22, 163, 74, 0.2) !important;
+        }
+
+        .badge.bg-warning {
+            background-color: rgba(22, 163, 74, 0.1) !important;
+            color: var(--dark-green) !important;
+            border: 1px solid rgba(22, 163, 74, 0.2) !important;
+        }
+
+        .form-control:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-green) !important;
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15) !important;
+            outline: none !important;
+        }
+
+        .form-control,
+        select,
+        textarea {
+            border-radius: 10px;
+            border: 1px solid var(--theme-border);
+            transition: all 0.2s ease;
+        }
+
+        /* Modern Table styling globally */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+        }
+
+        .table {
+            border-color: var(--theme-border);
+            vertical-align: middle;
+            width: 100% !important;
+        }
+
+        .table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            padding: 12px 14px;
+        }
+
+        .table td {
+            padding: 14px 14px;
+            color: #334155;
+            font-size: 0.88rem;
+        }
+
+        /* Page-link global styling */
+        .page-item .page-link {
+            border: 1px solid var(--theme-border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: #4b5563;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary-green) !important;
+            border-color: var(--primary-green) !important;
+            color: #ffffff !important;
+        }
+
+        /* ===========================
+        SIDEBAR
+=========================== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            border-right: 1px solid var(--sidebar-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1050;
+            box-shadow: 4px 0 24px rgba(15, 23, 42, 0.15);
+        }
+
+        .sidebar-logo {
+            height: 74px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0 24px;
+        }
+
+        .sidebar-logo h2 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-logo span {
+            color: var(--light-green);
+        }
+
+        .mobile-logo {
+            display: none;
+        }
+
+        .sidebar-menu {
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 12px;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.07);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .sidebar-menu a:hover i {
+            color: var(--light-green);
+        }
+
+        .sidebar-menu a.active {
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.18) 0%, rgba(34, 197, 94, 0.05) 100%);
+            color: #ffffff;
+            font-weight: 700;
+            border-left: 4px solid var(--light-green);
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.15);
+        }
+
+        .sidebar-menu a.active i {
+            color: var(--light-green);
+        }
+
+        .sidebar-menu i {
+            font-size: 19px;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        /* ===========================
+        MAIN
+=========================== */
+        .main {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===========================
+      TOPBAR
+=========================== */
+        .topbar {
+            position: relative;
+            z-index: 1040 !important;
+            height: 74px;
+            background-color: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 35px;
+            border-bottom: 1px solid var(--theme-border);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .dropdown {
+            position: relative;
+            z-index: 1050;
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid var(--theme-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: var(--theme-dark-gray);
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: var(--theme-light-gray);
+            color: var(--theme-black);
+        }
+
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            background: #EF4444;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            border: 1.5px solid #fff;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--theme-black);
+            padding: 7px 16px;
+            border-radius: 50px;
+            border: 1px solid var(--theme-border);
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        .profile-btn:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-green);
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--theme-black);
+        }
+
+        .profile-role {
+            font-size: 11px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .online-dot {
+            width: 7px;
+            height: 7px;
+            background: #22C55E;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            z-index: 1060 !important;
+            border-radius: 14px !important;
+            border: 1px solid var(--theme-border) !important;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.15) !important;
+            padding: 8px !important;
+            margin-top: 10px !important;
+            animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #475569;
+            padding: 9px 16px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+            color: var(--theme-black);
+        }
+
+        .dropdown-item.text-danger:hover {
+            background-color: #fef2f2;
+            color: #dc2626 !important;
+        }
+
+        /* ===========================
+      LANGUAGE SELECTOR
+=========================== */
+        .lang-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(22, 163, 74, 0.08);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            padding: 3px 8px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        .lang-wrapper:hover {
+            background: rgba(22, 163, 74, 0.14);
+            border-color: var(--primary-green);
+        }
+
+        .lang-text {
+            color: var(--theme-black);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .lang-text i {
+            color: var(--primary-green);
+            font-size: 13px;
+        }
+
+        #google_translate_element {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .goog-te-gadget {
+            font-family: 'Inter', sans-serif !important;
+            color: transparent !important;
+            font-size: 0 !important;
+        }
+
+        .goog-logo-link,
+        .goog-te-gadget>span,
+        .goog-te-gadget>div>span {
+            display: none !important;
+        }
+
+        .goog-te-gadget,
+        .goog-te-gadget>div {
+            display: inline-block !important;
+            vertical-align: middle !important;
+        }
+
+        .goog-te-combo {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            padding: 1px 6px !important;
+            height: 28px !important;
+            width: 100px !important;
+            border-radius: 50px !important;
+            border: 1.5px solid var(--primary-green) !important;
+            background: #ffffff !important;
+            color: #111827 !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.1) !important;
+        }
+
+        .goog-te-combo:hover,
+        .goog-te-combo:focus {
+            border-color: var(--dark-green) !important;
+            box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2) !important;
+        }
+
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-banner-frame {
+            display: none !important;
+        }
+
+        body {
+            top: 0 !important;
+            position: static !important;
+        }
+
+        .skiptranslate iframe,
+        iframe.goog-te-banner-frame {
+            display: none !important;
+        }
+
+        #goog-gt-tt,
+        .goog-te-balloon-text {
+            display: none !important;
+        }
+
+        .goog-text-highlight {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* ===========================
+      CONTENT
+=========================== */
+        .content {
+            padding: 35px;
+            min-height: calc(100vh - 74px);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--sidebar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-green);
+        }
+
+        /* ===========================
+      RESPONSIVE
+=========================== */
+        @media (min-width: 992px) {
+            .sidebar {
+                width: 260px !important;
+                transform: none !important;
+                visibility: visible !important;
+            }
+
+            .main {
+                margin-left: 260px;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                width: 280px;
+            }
+
+            .main {
+                margin-left: 0 !important;
+            }
+
+            .topbar {
+                padding: 0 20px;
+            }
+
+            .page-title {
+                font-size: 18px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .topbar {
+                padding: 0 12px;
+                gap: 8px;
+            }
+
+            .topbar-right {
+                gap: 8px;
+            }
+
+            .lang-wrapper {
+                padding: 2px 6px;
+            }
+
+            .lang-text span {
+                display: none;
+            }
+
+            .goog-te-combo {
+                width: 100px !important;
+                font-size: 12px !important;
+                padding: 2px 4px !important;
+            }
+
+            .profile-info {
+                display: none;
+            }
+        }
+    </style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "y21k5sm8xk");
+</script>
+
+</head>
+
+<body>
+    <!-- Sidebar (Visible only when driver is logged in and not on login/register pages) -->
+    {% if request.user.is_authenticated and request.user.role == 'driver' and request.resolver_match.url_name != 'driver_login' and request.resolver_match.url_name != 'driver_register' %}
+    <div class="sidebar offcanvas offcanvas-lg offcanvas-start" id="sidebarMenu" aria-labelledby="sidebarMenuLabel"
+        tabindex="-1">
+
+        <div class="sidebar-logo">
+            <h2>
+                <img src="{% static 'user/images/logo.png' %}" alt="TaxiGo Logo" height="34" style="object-fit: contain; margin-right: 8px; border-radius: 6px;"> Taxi<span>Go</span>
+            </h2>
+            <!-- Close Button for Mobile view -->
+            <button type="button" class="btn-close btn-close-white d-lg-none ms-auto" data-bs-dismiss="offcanvas"
+                data-bs-target="#sidebarMenu" aria-label="Close"></button>
+        </div>
+
+        <div class="sidebar-menu">
+
+            <a href="{% url 'driver_dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'driver_dashboard' %}active{% endif %}">
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{% url 'driver_vehicle_list' %}"
+                class="{% if request.resolver_match.url_name == 'driver_vehicle_list' %}active{% endif %}">
+                <span>My Vehicle</span>
+            </a>
+
+            <a href="{% url 'booking_requests' %}"
+                class="{% if request.resolver_match.url_name == 'booking_requests' %}active{% endif %}">
+                <span>Booking Requests</span>
+            </a>
+
+            <a href="{% url 'driver_active_ride' %}"
+                class="{% if request.resolver_match.url_name == 'driver_active_ride' %}active{% endif %}">
+                <span>Active Ride</span>
+            </a>
+
+            <a href="{% url 'ride_history' %}"
+                class="{% if request.resolver_match.url_name == 'ride_history' %}active{% endif %}">
+                <span>Ride History</span>
+            </a>
+
+            <a href="{% url 'driver_earnings' %}"
+                class="{% if request.resolver_match.url_name == 'driver_earnings' %}active{% endif %}">
+                <span>Earnings</span>
+            </a>
+
+            <a href="{% url 'my_reviews' %}"
+                class="{% if request.resolver_match.url_name == 'my_reviews' %}active{% endif %}">
+                <span>My Reviews</span>
+            </a>
+
+            <a href="{% url 'driver_logout' %}"
+                class="{% if request.resolver_match.url_name == 'driver_logout' %}active{% endif %}">
+                <span>Logout</span>
+            </a>
+
+        </div>
+
+    </div>
+    {% endif %}
+
+    <!-- Main Start -->
+    <div class="main" {% if not request.user.is_authenticated or request.user.role != 'driver' or request.resolver_match.url_name == 'driver_login' or request.resolver_match.url_name == 'driver_register' %}style="margin-left: 0 !important;"{% endif %}>
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+
+            <div class="d-flex align-items-center gap-3">
+                {% if request.user.is_authenticated and request.user.role == 'driver' and request.resolver_match.url_name != 'driver_login' and request.resolver_match.url_name != 'driver_register' %}
+                <!-- Hamburger Menu Button (visible on mobile/tablet only) -->
+                <button class="btn p-0 border-0 d-lg-none" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Toggle navigation">
+                    <i class="bi bi-list fs-2 text-dark"></i>
+                </button>
+                {% else %}
+                <a class="navbar-brand text-dark fw-bold fs-4 text-decoration-none" href="{% url 'home' %}">
+                    <img src="{% static 'user/images/logo.png' %}" alt="TaxiGo Logo" height="34" style="object-fit: contain; margin-right: 8px; border-radius: 6px;"> Taxi<span class="text-primary">Go</span>
+                </a>
+                {% endif %}
+                <h3 class="page-title m-0">
+                    {% block page %}
+                    Driver Dashboard
+                    {% endblock %}
+                </h3>
+            </div>
+
+            <div class="topbar-right">
+
+                <!-- Language Selector -->
+                <div class="lang-wrapper">
+                    <span class="lang-text"><i class="bi bi-globe"></i></span>
+                    <div id="google_translate_element"></div>
+                </div>
+
+                {% if request.user.is_authenticated and request.user.role == 'driver' and request.resolver_match.url_name != 'driver_login' and request.resolver_match.url_name != 'driver_register' %}
+                <!-- Profile -->
+                <div class="dropdown">
+
+                    <a class="profile-btn dropdown-toggle" href="#" data-bs-toggle="dropdown">
+
+                        {% if request.user.driver.profile_image %}
+                        <img src="{{ request.user.driver.profile_image.url }}" class="profile-img">
+                        {% else %}
+                        <img src="{% static 'images/default-profile.png' %}" class="profile-img">
+                        {% endif %}
+
+                        <div class="profile-info">
+                            <div class="profile-name">
+                                {{ request.user.driver.full_name }}
+                            </div>
+
+                            <div class="profile-role">
+                                <span class="online-dot"></span>
+                                Driver
+                            </div>
+                        </div>
+
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4">
+
+                        <li>
+                            <a class="dropdown-item" href="{% url 'driver_profile' %}">
+                                <i class="bi bi-person me-2"></i>
+                                My Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="{% url 'driver_vehicle_list' %}">
+                                <i class="bi bi-car-front me-2"></i>
+                                My Vehicle
+                            </a>
+                        </li>
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item text-danger" href="{% url 'driver_logout' %}">
+                                <i class="bi bi-box-arrow-right me-2"></i>
+                                Logout
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+                {% else %}
+                <div class="d-flex gap-2">
+                    <a href="{% url 'driver_login' %}" class="btn btn-sm btn-outline-primary fw-bold">Login</a>
+                    <a href="{% url 'driver_register' %}" class="btn btn-sm btn-primary fw-bold">Register</a>
+                </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+        <!-- ==========================
+        CONTENT
+========================== -->
+
+        <div class="content">
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm border-0 mb-4 d-flex align-items-center"
+                role="alert">
+                {% if message.tags == 'success' %}
+                <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                {% else %}
+                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                {% endif %}
+                <div>
+                    {{ message }}
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+
+    </div>
+
+    <!-- Bootstrap -->
+
+    <script src="{% static 'user/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Active Sidebar Menu -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            let current = window.location.pathname;
+
+            document.querySelectorAll(".sidebar-menu a").forEach(function (link) {
+
+                if (link.getAttribute("href") == current) {
+
+                    link.classList.add("active");
+
+                }
+
+            });
+
+        });
+
+    </script>
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,gu,mr,bn,ta,te,pa,ur',
+                autoDisplay: false
+            }, 'google_translate_element');
+
+            var checkExist = setInterval(function () {
+                var select = document.querySelector('.goog-te-combo');
+                if (select && select.options && select.options.length > 0) {
+                    select.options[0].text = 'Language';
+                    clearInterval(checkExist);
+                }
+            }, 100);
+        }
+    </script>
+
+
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    {% block extra_js %}
+    {% endblock %}
+
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+
+</html>

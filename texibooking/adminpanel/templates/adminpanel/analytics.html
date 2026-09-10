@@ -1,0 +1,1220 @@
+{% extends 'adminpanel/base.html' %}
+{% load static %}
+
+{% block title %}Analytics - TaxiGo Admin{% endblock %}
+
+{% block page %}Analytics Dashboard{% endblock %}
+
+{% block content %}
+<!-- Google Fonts (Poppins & Inter) & Custom Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    /* Scoped Analytics Wrapper */
+    .analytics-section {
+        font-family: 'Inter', sans-serif;
+        color: #1e293b;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Theme Variables local override for consistency */
+    :root {
+        --tg-green: #2563EB;
+        --tg-green-light: #2563EB;
+        --tg-dark: #0F172A;
+        --tg-gray: #F8FAFC;
+        --tg-border: #E2E8F0;
+    }
+
+    /* Glassmorphic filter bar */
+    .filter-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--tg-border);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(17, 24, 39, 0.04);
+        margin-bottom: 2rem;
+    }
+
+    .filter-btn-group .btn {
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 8px;
+        border: 1.5px solid var(--tg-border);
+        background: #ffffff;
+        color: #475569;
+        transition: all 0.25s ease;
+    }
+
+    .filter-btn-group .btn:hover {
+        background: #f1f5f9;
+        color: var(--tg-dark);
+        border-color: #cbd5e1;
+    }
+
+    .filter-btn-group .btn.active {
+        background: var(--tg-green);
+        color: #ffffff !important;
+        border-color: var(--tg-green);
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+    }
+
+    /* Date picker inputs style */
+    .date-input-premium {
+        height: 40px;
+        border-radius: 8px;
+        border: 1.5px solid var(--tg-border);
+        padding: 8px 12px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--tg-dark);
+        transition: all 0.2s ease;
+    }
+
+    .date-input-premium:focus {
+        border-color: var(--tg-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+    }
+
+    /* KPI Cards Glassmorphic design */
+    .kpi-card {
+        background: #ffffff;
+        border: 1px solid var(--tg-border);
+        border-radius: 16px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(17, 24, 39, 0.02);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 36px rgba(17, 24, 39, 0.08) !important;
+        border-color: var(--tg-green);
+    }
+
+    /* Glowing circle accent inside cards */
+    .kpi-card::after {
+        content: "";
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        top: -30px;
+        right: -30px;
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    .kpi-card.kpi-users::after { background: rgba(59, 130, 246, 0.06); }
+    .kpi-card.kpi-drivers::after { background: rgba(34, 197, 94, 0.06); }
+    .kpi-card.kpi-vehicles::after { background: rgba(168, 85, 247, 0.06); }
+    .kpi-card.kpi-bookings::after { background: rgba(234, 179, 8, 0.06); }
+    .kpi-card.kpi-revenue::after { background: rgba(22, 163, 74, 0.08); }
+
+    .kpi-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .kpi-val {
+        font-family: 'Poppins', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--tg-dark);
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .kpi-footer {
+        margin-top: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+        font-weight: 600;
+    }
+
+    .kpi-footer .indicator-up { color: #22c55e; }
+    .kpi-footer .indicator-down { color: #ef4444; }
+    .kpi-footer .indicator-neutral { color: #64748b; }
+
+    .kpi-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .icon-box-blue { background: rgba(59, 130, 246, 0.08); color: #3b82f6; }
+    .icon-box-green { background: rgba(34, 197, 94, 0.08); color: #22c55e; }
+    .icon-box-purple { background: rgba(168, 85, 247, 0.08); color: #a855f7; }
+    .icon-box-yellow { background: rgba(234, 179, 8, 0.08); color: #eab308; }
+    .icon-box-dark { background: rgba(17, 24, 39, 0.06); color: var(--tg-dark); }
+    .icon-box-red { background: rgba(239, 68, 68, 0.08); color: #ef4444; }
+
+    /* Chart Container styling */
+    .chart-card {
+        background: #ffffff;
+        border: 1px solid var(--tg-border);
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(17, 24, 39, 0.03);
+        padding: 24px;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .chart-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 18px 40px rgba(17, 24, 39, 0.07);
+        border-color: rgba(22, 163, 74, 0.4);
+    }
+
+    .chart-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 14px;
+    }
+
+    .chart-card-header h5 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--tg-dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chart-card-header h5 i {
+        color: var(--tg-green);
+        font-size: 18px;
+    }
+
+    .chart-canvas-wrapper {
+        position: relative;
+        width: 100%;
+        min-height: 300px;
+    }
+
+    /* Section Subheadings */
+    .section-title {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
+        font-size: 18px;
+        color: var(--tg-dark);
+        margin-top: 1.5rem;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title::after {
+        content: "";
+        flex-grow: 1;
+        height: 1px;
+        background: var(--tg-border);
+    }
+
+    /* Custom Responsive Adjustments */
+    @media (max-width: 767.98px) {
+        .filter-card {
+            padding: 16px;
+        }
+        .filter-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .filter-btn-group .btn {
+            flex: 1 1 auto;
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+        .kpi-card {
+            padding: 16px;
+        }
+        .kpi-val {
+            font-size: 24px;
+        }
+        .chart-card {
+            padding: 16px;
+        }
+    }
+</style>
+
+<div class="analytics-section py-3">
+
+    <!-- Filters Section -->
+    <div class="filter-card">
+        <form method="GET" action="{% url 'admin_analytics' %}" id="filterForm">
+            <div class="row align-items-center g-3">
+                <div class="col-xl-7 col-lg-12">
+                    <div class="filter-btn-group d-flex gap-2">
+                        <button type="submit" name="filter" value="all" class="btn {% if filter_type == 'all' or not filter_type %}active{% endif %}">
+                            All Time
+                        </button>
+                        <button type="submit" name="filter" value="today" class="btn {% if filter_type == 'today' %}active{% endif %}">
+                            Today
+                        </button>
+                        <button type="submit" name="filter" value="last_7_days" class="btn {% if filter_type == 'last_7_days' %}active{% endif %}">
+                            Last 7 Days
+                        </button>
+                        <button type="submit" name="filter" value="this_month" class="btn {% if filter_type == 'this_month' %}active{% endif %}">
+                            This Month
+                        </button>
+                        <button type="submit" name="filter" value="this_year" class="btn {% if filter_type == 'this_year' %}active{% endif %}">
+                            This Year
+                        </button>
+                        <button type="button" id="customFilterBtn" class="btn {% if filter_type == 'custom' %}active{% endif %}">
+                            Custom Range
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-xl-5 col-lg-12" id="customDateRangeBox" style="{% if filter_type != 'custom' %}display: none;{% endif %}">
+                    <input type="hidden" name="filter" value="custom" id="hiddenFilterType" {% if filter_type != 'custom' %}disabled{% endif %}>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="date" name="start_date" id="startDatePicker" value="{{ start_date }}" class="form-control date-input-premium" placeholder="Start Date">
+                        <span class="text-muted fw-bold">to</span>
+                        <input type="date" name="end_date" id="endDatePicker" value="{{ end_date }}" class="form-control date-input-premium" placeholder="End Date">
+                        <button type="submit" class="btn btn-warning px-3" style="height: 40px; border-radius: 8px;">
+                            <i class="bi bi-filter"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- ================= Row 1: Primary KPI Cards (4 cards) ================= -->
+    <div class="section-title">
+        <i class="bi bi-pie-chart text-success"></i> Primary Admin Metrics
+    </div>
+    <div class="row g-4 mb-4">
+        <!-- Card 1: Total Users -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card kpi-users">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Total Users</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ total_users }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-blue">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer">
+                    <span class="indicator-up"><i class="bi bi-arrow-up-short"></i>+{{ new_users_week }}</span>
+                    <span class="text-muted">registered this week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Total Drivers -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card kpi-drivers">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Total Drivers</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ total_drivers }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-green">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer">
+                    <span class="indicator-up"><i class="bi bi-arrow-up-short"></i>+{{ new_drivers_week }}</span>
+                    <span class="text-muted">verified this week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Total Vehicles -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card kpi-vehicles">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Total Vehicles</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ total_vehicles }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-purple">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer">
+                    <span class="indicator-up"><i class="bi bi-arrow-up-short"></i>+{{ new_vehicles_week }}</span>
+                    <span class="text-muted">registered this week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Total Bookings -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card kpi-bookings">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Total Bookings</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ total_bookings }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-yellow">
+                        <i class="bi bi-journal-check"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer">
+                    <span class="indicator-up"><i class="bi bi-arrow-up-short"></i>+{{ new_bookings_week }}</span>
+                    <span class="text-muted">booked this week</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= Row 2: Booking Status KPI Cards (4 cards) ================= -->
+    <div class="section-title">
+        <i class="bi bi-grid-fill text-success"></i> Bookings Breakdown
+    </div>
+    <div class="row g-4 mb-4">
+        <!-- Card 5: Pending Bookings -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Pending Bookings</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ pending_bookings }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-yellow">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer text-warning">
+                    <i class="bi bi-exclamation-circle-fill"></i> Requiring driver assignment
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 6: Confirmed Bookings -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Confirmed Bookings</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ confirmed_bookings }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-blue">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer text-primary">
+                    <i class="bi bi-clock-history"></i> Scheduled to pickup
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 7: Completed Bookings -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Completed Bookings</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ completed_bookings }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-green">
+                        <i class="bi bi-bag-check-fill"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer text-success">
+                    <i class="bi bi-shield-fill-check"></i> Safely delivered trips
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 8: Cancelled Bookings -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Cancelled Bookings</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ cancelled_bookings }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-red">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer text-danger">
+                    <i class="bi bi-info-circle-fill"></i> Customer &amp; driver cancellations
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= Row 3: Revenue KPI Cards (2 cards) ================= -->
+    <div class="section-title">
+        <i class="bi bi-cash-coin text-success"></i> Revenue indicators
+    </div>
+    <div class="row g-4 mb-5">
+        <!-- Card 9: Today's Revenue -->
+        <div class="col-md-6 col-12">
+            <div class="kpi-card kpi-revenue">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Today's Revenue</div>
+                        <h3 class="kpi-val">₹<span class="counter-anim" data-target="{{ today_revenue }}">{{ today_revenue }}</span></h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-green">
+                        <i class="bi bi-currency-rupee fs-4"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer">
+                    {% if revenue_growth >= 0 %}
+                        <span class="indicator-up"><i class="bi bi-arrow-up-short"></i>+{{ revenue_growth }}%</span>
+                    {% else %}
+                        <span class="indicator-down"><i class="bi bi-arrow-down-short"></i>{{ revenue_growth }}%</span>
+                    {% endif %}
+                    <span class="text-muted">growth compared to last week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 10: Monthly Revenue -->
+        <div class="col-md-6 col-12">
+            <div class="kpi-card kpi-revenue">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">This Month's Revenue</div>
+                        <h3 class="kpi-val">₹<span class="counter-anim" data-target="{{ monthly_revenue }}">{{ monthly_revenue }}</span></h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-green">
+                        <i class="bi bi-bank2"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer">
+                    <span class="indicator-neutral"><i class="bi bi-calendar-event"></i> Filtered Range Revenue:</span>
+                    <span class="fw-bold text-success">₹{{ filtered_revenue|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+    <!-- ================= Row 4: Review & Rating KPI Cards (4 cards) ================= -->
+    <div class="section-title">
+        <i class="bi bi-star-fill text-warning"></i> Customer Review &amp; Rating Metrics
+    </div>
+    <div class="row g-4 mb-5">
+        <!-- Card 11: Total Reviews -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Total Reviews</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ total_reviews }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-yellow">
+                        <i class="bi bi-chat-square-heart-fill"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer text-warning">
+                    <i class="bi bi-patch-check-fill me-1"></i> Customer feedback received
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 12: Average Rating -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Average Platform Rating</div>
+                        <h3 class="kpi-val text-warning">{{ avg_review_rating }} <span class="fs-6 text-muted">/ 5.0</span></h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-green">
+                        <i class="bi bi-star-half"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer text-success">
+                    <i class="bi bi-star-fill text-warning me-1"></i> Overall satisfaction score
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 13: 5-Star Reviews -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">5-Star Excellence</div>
+                        <h3 class="kpi-val counter-anim" data-target="{{ r5_count }}">0</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-blue">
+                        <i class="bi bi-award-fill"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer text-primary">
+                    <span class="fw-bold">{{ five_star_pct }}%</span> of total feedback
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 14: Positive Feedback Rate -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-label">Positive Feedback Ratio</div>
+                        <h3 class="kpi-val text-success">{{ positive_feedback_pct }}%</h3>
+                    </div>
+                    <div class="kpi-icon-box icon-box-green">
+                        <i class="bi bi-emoji-smile-fill"></i>
+                    </div>
+                </div>
+                <div class="kpi-footer text-muted">
+                    Rated 4★ or 5★ by riders
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= CHARTS GRID SECTION ================= -->
+    <div class="section-title">
+        <i class="bi bi-graph-up-arrow text-success"></i> Visual Analytics &amp; Trends
+    </div>
+
+    <!-- Review Rating Distribution & Live Feedback Preview Row -->
+    <div class="row mb-4">
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-star-fill text-warning"></i> Customer Rating Distribution</h5>
+                    <span class="badge bg-light text-dark border">Star Breakdown</span>
+                </div>
+                <div class="chart-canvas-wrapper" style="height: 310px;">
+                    <canvas id="analyticsReviewRatingChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-chat-left-quote-fill text-success"></i> Recent Live Customer Feedback</h5>
+                    <a href="{% url 'review_list' %}" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                        View All Reviews
+                    </a>
+                </div>
+                <div class="table-responsive" style="max-height: 310px; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted fs-8 text-uppercase">
+                            <tr>
+                                <th>User</th>
+                                <th>Driver</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rev in recent_reviews %}
+                            <tr>
+                                <td><span class="fw-semibold text-dark fs-7">{{ rev.user.username }}</span></td>
+                                <td><span class="fs-7 text-muted">{{ rev.driver.full_name }}</span></td>
+                                <td>
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning-subtle rounded-pill fs-8">
+                                        {{ rev.rating }}.0 <i class="bi bi-star-fill"></i>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fs-7 text-dark text-truncate d-inline-block" style="max-width: 170px;" title="{{ rev.comment }}">
+                                        "{{ rev.comment }}"
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted fs-7">No reviews submitted yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. Revenue vs Bookings (Dual Line Chart) - FULL WIDTH -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-activity"></i> Revenue vs Bookings Trend (Last 12 Months)</h5>
+                    <span class="badge bg-light text-dark border">Dual Axis Chart</span>
+                </div>
+                <div class="chart-canvas-wrapper" style="height: 380px;">
+                    <canvas id="revVsBookingsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1: Booking Status (Pie) & Daily Bookings (Line) -->
+    <div class="row">
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-pie-chart-fill"></i> Booking Status Distribution</h5>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="bookingStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-calendar3"></i> Daily Booking Counts</h5>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="dailyBookingsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2: Monthly Booking Trend & Monthly Revenue -->
+    <div class="row">
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-bezier2"></i> Monthly Booking Trend (Last 12 Months)</h5>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="monthlyBookingTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-bar-chart-fill"></i> Monthly Revenue (Last 12 Months)</h5>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="monthlyRevenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 3: User Reg Trend & Driver Reg Trend -->
+    <div class="row">
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-person-plus-fill"></i> User Registration Trend (Last 12 Months)</h5>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="userRegTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-person-badge"></i> Driver Registration Trend (Last 12 Months)</h5>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="driverRegTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 4: Top Drivers & Most Booked Vehicles -->
+    <div class="row">
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-star-fill"></i> Top 10 Drivers (Completed Rides)</h5>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="topDriversChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-car-front-fill"></i> Top 10 Booked Vehicles</h5>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="topVehiclesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 5: Distance Distribution (Full width or centered) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="bi bi-distribute-horizontal"></i> Ride Distance Distribution</h5>
+                </div>
+                <div class="chart-canvas-wrapper" style="height: 320px;">
+                    <canvas id="distanceDistChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js and Custom JS Logic -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Toggle Custom Date picker range visibility
+        const customFilterBtn = document.getElementById("customFilterBtn");
+        const customDateRangeBox = document.getElementById("customDateRangeBox");
+        const hiddenFilterType = document.getElementById("hiddenFilterType");
+
+        if(customFilterBtn) {
+            customFilterBtn.addEventListener("click", function () {
+                if (customDateRangeBox.style.display === "none") {
+                    customDateRangeBox.style.display = "block";
+                    hiddenFilterType.disabled = false;
+                    customFilterBtn.classList.add("active");
+                    // remove active from others
+                    document.querySelectorAll(".filter-btn-group .btn").forEach(btn => {
+                        if (btn !== customFilterBtn) btn.classList.remove("active");
+                    });
+                } else {
+                    customDateRangeBox.style.display = "none";
+                    hiddenFilterType.disabled = true;
+                    customFilterBtn.classList.remove("active");
+                    // trigger click on All Time to reset if custom deselected
+                    window.location.href = "{% url 'admin_analytics' %}";
+                }
+            });
+        }
+
+        // Counter Animations for KPI Cards
+        const counters = document.querySelectorAll(".counter-anim");
+        counters.forEach(counter => {
+            const target = +counter.getAttribute("data-target");
+            const duration = 1000; // ms
+            const stepTime = 15;
+            const steps = duration / stepTime;
+            const increment = target / steps;
+            let current = 0;
+
+            if (target === 0) {
+                counter.innerText = "0";
+                return;
+            }
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    counter.innerText = Math.round(target).toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    counter.innerText = Math.round(current).toLocaleString();
+                }
+            }, stepTime);
+        });
+
+        // Load Chart.js Dataset
+        // Load Chart.js Dataset
+        const chartsData = JSON.parse('{{ charts_data|escapejs }}');
+
+        // Global Chart Options & Tooltip Defaults
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = "#64748b";
+        Chart.defaults.plugins.tooltip.backgroundColor = '#0f172a';
+        Chart.defaults.plugins.tooltip.titleFont = { family: "'Poppins', sans-serif", weight: '700', size: 13 };
+        Chart.defaults.plugins.tooltip.bodyFont = { family: "'Inter', sans-serif", weight: '500', size: 12 };
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 10;
+        Chart.defaults.plugins.tooltip.boxPadding = 6;
+
+        // Gradient Generator Helper
+        function createLinearGradient(ctx, colorStart, colorEnd, height = 300) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, colorStart);
+            gradient.addColorStop(1, colorEnd);
+            return gradient;
+        }
+
+        // 1. Booking Status (Doughnut Chart with Cutout & Spacing)
+        const ctxStatus = document.getElementById("bookingStatusChart").getContext("2d");
+        new Chart(ctxStatus, {
+            type: "doughnut",
+            data: {
+                labels: chartsData.status_chart.labels,
+                datasets: [{
+                    data: chartsData.status_chart.data,
+                    backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#f43f5e'],
+                    borderWidth: 3,
+                    borderColor: "#ffffff",
+                    hoverOffset: 8,
+                    borderRadius: 4,
+                    spacing: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '72%',
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { boxWidth: 12, padding: 16, font: { weight: '600', size: 12 } }
+                    }
+                }
+            }
+        });
+
+        // 2. Monthly Booking Trend (Line Chart with Gradient Fill)
+        const ctxMonthlyTrend = document.getElementById("monthlyBookingTrendChart").getContext("2d");
+        new Chart(ctxMonthlyTrend, {
+            type: "line",
+            data: {
+                labels: chartsData.monthly_trend.labels,
+                datasets: [{
+                    label: "Bookings Count",
+                    data: chartsData.monthly_trend.bookings,
+                    borderColor: '#a855f7',
+                    backgroundColor: createLinearGradient(ctxMonthlyTrend, 'rgba(168, 85, 247, 0.35)', 'rgba(168, 85, 247, 0.0)'),
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#a855f7',
+                    pointBorderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [4, 4], color: 'rgba(226, 232, 240, 0.8)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 3. Monthly Revenue (Bar Chart with Rounded Corners & Gradient)
+        const ctxMonthlyRev = document.getElementById("monthlyRevenueChart").getContext("2d");
+        new Chart(ctxMonthlyRev, {
+            type: "bar",
+            data: {
+                labels: chartsData.monthly_trend.labels,
+                datasets: [{
+                    label: "Monthly Revenue (₹)",
+                    data: chartsData.monthly_trend.revenue,
+                    backgroundColor: createLinearGradient(ctxMonthlyRev, '#10b981', '#047857'),
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [4, 4], color: 'rgba(226, 232, 240, 0.8)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 4. User Registration Trend (Line Chart)
+        const ctxUserReg = document.getElementById("userRegTrendChart").getContext("2d");
+        new Chart(ctxUserReg, {
+            type: "line",
+            data: {
+                labels: chartsData.user_reg.labels,
+                datasets: [{
+                    label: "Users Registered",
+                    data: chartsData.user_reg.data,
+                    borderColor: '#6366f1',
+                    backgroundColor: createLinearGradient(ctxUserReg, 'rgba(99, 102, 241, 0.35)', 'rgba(99, 102, 241, 0.0)'),
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#6366f1',
+                    pointBorderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [4, 4], color: 'rgba(226, 232, 240, 0.8)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 5. Driver Registration Trend (Line Chart)
+        const ctxDriverReg = document.getElementById("driverRegTrendChart").getContext("2d");
+        new Chart(ctxDriverReg, {
+            type: "line",
+            data: {
+                labels: chartsData.driver_reg.labels,
+                datasets: [{
+                    label: "Drivers Registered",
+                    data: chartsData.driver_reg.data,
+                    borderColor: '#10b981',
+                    backgroundColor: createLinearGradient(ctxDriverReg, 'rgba(16, 185, 129, 0.35)', 'rgba(16, 185, 129, 0.0)'),
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#10b981',
+                    pointBorderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [4, 4], color: 'rgba(226, 232, 240, 0.8)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 6. Top Drivers (Horizontal Bar Chart)
+        const ctxTopDrivers = document.getElementById("topDriversChart").getContext("2d");
+        new Chart(ctxTopDrivers, {
+            type: "bar",
+            data: {
+                labels: chartsData.top_drivers.labels.length ? chartsData.top_drivers.labels : ["No Data"],
+                datasets: [{
+                    label: "Completed Rides",
+                    data: chartsData.top_drivers.data.length ? chartsData.top_drivers.data : [0],
+                    backgroundColor: createLinearGradient(ctxTopDrivers, '#3b82f6', '#1d4ed8'),
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { beginAtZero: true, grid: { borderDash: [4, 4], color: 'rgba(226, 232, 240, 0.8)' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 7. Most Booked Vehicles (Horizontal Bar Chart)
+        const ctxTopVehicles = document.getElementById("topVehiclesChart").getContext("2d");
+        new Chart(ctxTopVehicles, {
+            type: "bar",
+            data: {
+                labels: chartsData.top_vehicles.labels.length ? chartsData.top_vehicles.labels : ["No Data"],
+                datasets: [{
+                    label: "Bookings",
+                    data: chartsData.top_vehicles.data.length ? chartsData.top_vehicles.data : [0],
+                    backgroundColor: createLinearGradient(ctxTopVehicles, '#8b5cf6', '#6d28d9'),
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { beginAtZero: true, grid: { borderDash: [4, 4], color: 'rgba(226, 232, 240, 0.8)' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 8. Ride Distance Distribution (Bar Chart)
+        const ctxDistance = document.getElementById("distanceDistChart").getContext("2d");
+        new Chart(ctxDistance, {
+            type: "bar",
+            data: {
+                labels: chartsData.distance_dist.labels,
+                datasets: [{
+                    label: "Rides Logged",
+                    data: chartsData.distance_dist.data,
+                    backgroundColor: createLinearGradient(ctxDistance, '#f59e0b', '#d97706'),
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [4, 4], color: 'rgba(226, 232, 240, 0.8)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 9. Daily Bookings (Line Chart)
+        const ctxDaily = document.getElementById("dailyBookingsChart").getContext("2d");
+        new Chart(ctxDaily, {
+            type: "line",
+            data: {
+                labels: chartsData.daily_bookings.labels,
+                datasets: [{
+                    label: "Daily Bookings",
+                    data: chartsData.daily_bookings.data,
+                    borderColor: '#3b82f6',
+                    backgroundColor: createLinearGradient(ctxDaily, 'rgba(59, 130, 246, 0.35)', 'rgba(59, 130, 246, 0.0)'),
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#3b82f6',
+                    pointBorderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [4, 4], color: 'rgba(226, 232, 240, 0.8)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 10. Revenue vs Bookings (Dual Line Chart)
+        const ctxRevVsBookings = document.getElementById("revVsBookingsChart").getContext("2d");
+        new Chart(ctxRevVsBookings, {
+            type: "line",
+            data: {
+                labels: chartsData.monthly_trend.labels,
+                datasets: [
+                    {
+                        label: "Revenue (₹)",
+                        data: chartsData.monthly_trend.revenue,
+                        borderColor: '#10b981',
+                        backgroundColor: createLinearGradient(ctxRevVsBookings, 'rgba(16, 185, 129, 0.25)', 'rgba(16, 185, 129, 0.0)'),
+                        yAxisID: "y-rev",
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 3,
+                        fill: true
+                    },
+                    {
+                        label: "Bookings",
+                        data: chartsData.monthly_trend.bookings,
+                        borderColor: '#6366f1',
+                        backgroundColor: createLinearGradient(ctxRevVsBookings, 'rgba(99, 102, 241, 0.15)', 'rgba(99, 102, 241, 0.0)'),
+                        yAxisID: "y-book",
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    "y-rev": {
+                        type: "linear",
+                        position: "left",
+                        title: { display: true, text: "Revenue (₹)", font: { family: "'Poppins', sans-serif", weight: '700', size: 12 } },
+                        beginAtZero: true,
+                        grid: { borderDash: [4, 4], color: 'rgba(226, 232, 240, 0.8)' }
+                    },
+                    "y-book": {
+                        type: "linear",
+                        position: "right",
+                        title: { display: true, text: "Bookings count", font: { family: "'Poppins', sans-serif", weight: '700', size: 12 } },
+                        beginAtZero: true,
+                        grid: { drawOnChartArea: false }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 11. Customer Rating Distribution (Doughnut/Bar Chart)
+        const ctxReviewChart = document.getElementById("analyticsReviewRatingChart");
+        if (ctxReviewChart && chartsData.review_dist) {
+            new Chart(ctxReviewChart.getContext("2d"), {
+                type: "doughnut",
+                data: {
+                    labels: chartsData.review_dist.labels,
+                    datasets: [{
+                        label: "Reviews",
+                        data: chartsData.review_dist.data,
+                        backgroundColor: ['#16a34a', '#22c55e', '#f59e0b', '#f97316', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: {
+                            position: "right",
+                            labels: { boxWidth: 12, padding: 12, font: { weight: '600', size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

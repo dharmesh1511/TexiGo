@@ -1,0 +1,313 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block title %}
+Driver Registration - TaxiGo
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --tg-blue: #2563EB;
+        --tg-blue-hover: #1D4ED8;
+        --tg-black: #0F172A;
+        --tg-border: #E5E7EB;
+        --tg-bg: #F8FAFC;
+    }
+
+    .auth-wrap {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 20px;
+        background: var(--tg-bg);
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 680px;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        border: 1px solid var(--tg-border);
+        overflow: hidden;
+    }
+
+    .auth-head {
+        text-align: center;
+        padding: 35px 35px 20px;
+    }
+
+    .auth-logo {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        border-radius: 18px;
+        background: var(--tg-blue);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
+    }
+
+    .auth-head h3 {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--tg-black);
+        margin: 0;
+    }
+
+    .auth-head p {
+        font-size: 14px;
+        color: #64748B;
+        margin-top: 6px;
+        margin-bottom: 0;
+    }
+
+    .auth-body {
+        padding: 15px 35px 35px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 6px;
+    }
+
+    .auth-body .form-control,
+    .auth-body textarea,
+    .auth-body select {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid #D1D5DB;
+        padding: 10px 14px;
+        font-size: 14px;
+        color: var(--tg-black);
+        background: #ffffff;
+        outline: none;
+        transition: 0.2s ease;
+    }
+
+    .auth-body .form-control:focus,
+    .auth-body textarea:focus,
+    .auth-body select:focus {
+        border-color: var(--tg-blue) !important;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+    }
+
+    #preview {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #ffffff;
+        display: none;
+        margin: 10px auto;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+
+    .btn-auth {
+        width: 100%;
+        min-height: 46px;
+        border: none;
+        border-radius: 10px;
+        background: var(--tg-blue);
+        color: #ffffff !important;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 6px 14px rgba(37, 99, 235, 0.20);
+        transition: all 0.2s ease;
+    }
+
+    .btn-auth:hover {
+        background: var(--tg-blue-hover);
+        transform: translateY(-1px);
+    }
+
+    .auth-alt {
+        text-align: center;
+        margin-top: 20px;
+        color: #64748B;
+        font-size: 14px;
+    }
+
+    .auth-alt a {
+        color: var(--tg-blue);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .auth-alt a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="auth-wrap">
+    <div class="auth-card">
+
+        <!-- Header -->
+        <div class="auth-head">
+            <div class="auth-logo">
+                <i class="bi bi-car-front-fill"></i>
+            </div>
+            <h3>Driver Registration</h3>
+            <p>Create your driver account to join TaxiGo</p>
+        </div>
+
+        <div class="auth-body">
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" style="border-radius: 10px;">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Form Errors -->
+            {% if form.errors %}
+                <div class="alert alert-danger mb-3" style="border-radius: 10px; font-size: 14px;">
+                    <strong>Please correct the errors below:</strong>
+                    <ul class="mb-0 ps-3">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><b>{{ field.label }}</b>: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" id="driverForm">
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <div class="col-md-6 col-12">
+                        <label class="form-label">Username</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="col-md-6 col-12">
+                        <label class="form-label">Full Name</label>
+                        {{ form.full_name }}
+                    </div>
+
+                    <div class="col-md-6 col-12">
+                        <label class="form-label">Email</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="col-md-6 col-12">
+                        <label class="form-label">Mobile Number</label>
+                        {{ form.mobile }}
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Address</label>
+                        {{ form.address }}
+                    </div>
+
+                    <div class="col-md-6 col-12">
+                        <label class="form-label">License Number</label>
+                        {{ form.license_number }}
+                    </div>
+
+                    <div class="col-md-6 col-12">
+                        <label class="form-label">Profile Image</label>
+                        {{ form.profile_image }}
+                    </div>
+
+                    <div class="col-12 text-center">
+                        <img id="preview" alt="Profile image preview">
+                    </div>
+
+                    <div class="col-md-6 col-12">
+                        <label class="form-label">Password</label>
+                        {{ form.password1 }}
+                    </div>
+
+                    <div class="col-md-6 col-12">
+                        <label class="form-label">Confirm Password</label>
+                        {{ form.password2 }}
+                    </div>
+                </div>
+
+                <!-- Terms checkbox -->
+                <div class="form-check my-3" style="font-size: 13px; color: #64748B;">
+                    <input class="form-check-input" type="checkbox" id="terms" required>
+                    <label class="form-check-label" for="terms">
+                        I agree to the Terms &amp; Conditions and Privacy Policy.
+                    </label>
+                </div>
+
+                <!-- Action Button -->
+                <button type="submit" class="btn-auth" id="submitBtn">
+                    Register Now
+                </button>
+            </form>
+
+            <hr class="my-4" style="border-color: var(--tg-border);">
+
+            <div class="auth-alt">
+                Already have an account?
+                <a href="{% url 'login' %}">Login Here</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Styling injections for Django forms
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("#driverForm input, #driverForm textarea, #driverForm select").forEach(function(el){
+            if(!el.classList.contains("form-control") && el.type !== "file" && el.type !== "checkbox"){
+                el.classList.add("form-control");
+            }
+        });
+    });
+
+    // Image preview
+    (function () {
+        var input = document.getElementById("id_profile_image");
+        var preview = document.getElementById("preview");
+        if (input && preview) {
+            input.addEventListener("change", function () {
+                var file = this.files[0];
+                if (file) {
+                    preview.src = URL.createObjectURL(file);
+                    preview.style.display = "block";
+                }
+            });
+        }
+    })();
+
+    // Button loading state
+    (function () {
+        var form = document.getElementById("driverForm");
+        var btn = document.getElementById("submitBtn");
+        if (form && btn) {
+            form.addEventListener("submit", function () {
+                if (form.checkValidity()) {
+                    btn.disabled = true;
+                    btn.innerHTML =
+                        '<span class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span> Creating account...';
+                }
+            });
+        }
+    })();
+</script>
+{% endblock %}

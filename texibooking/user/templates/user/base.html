@@ -1,0 +1,1106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="description"
+        content="TaxiGo - Premium taxi booking platform. Safe, fast and affordable rides with verified drivers.">
+    <title>
+        {% block title %}
+        TaxiGo
+        {% endblock %}
+    </title>
+
+    <!-- Google Fonts: Inter + Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{% static 'user/css/bootstrap.min.css' %}">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <style>
+        /* =====================================================
+   TAXIGO GLOBAL DESIGN SYSTEM
+===================================================== */
+        :root {
+            /* Brand Tokens (Royal Blue + Navy + White) */
+            --primary: #2563EB;
+            --primary-dark: #1D4ED8;
+            --primary-light: #DBEAFE;
+            --primary-green: #2563EB;
+            --hover-green: #1D4ED8;
+            --dark-green: #1E40AF;
+            --light-green: #2563EB;
+            --green-soft: rgba(37, 99, 235, 0.10);
+            --green-ring: rgba(37, 99, 235, 0.15);
+
+            /* Neutrals */
+            --navy: #0F172A;
+            --dark-navy: #111827;
+            --ink: #0F172A;
+            --ink-800: #1E293B;
+            --ink-700: #334155;
+            --muted: #64748B;
+            --muted-2: #94A3B8;
+            --line: #E5E7EB;
+            --line-2: #F1F5F9;
+            --bg-slate: #F8FAFC;
+            --white: #FFFFFF;
+
+            /* Effects */
+            --radius: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+            --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+            --shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.08);
+            --shadow-green: 0 6px 18px rgba(37, 99, 235, 0.25);
+            --transition: .2s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Fonts */
+            --font-head: 'Poppins', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            padding-top: 58px;
+            font-family: var(--font-body);
+            background: var(--bg-slate);
+            color: var(--ink-700);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-head);
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        ::selection {
+            background: var(--primary-green);
+            color: #fff;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--line-2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 20px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--hover-green);
+        }
+
+        /* Table Layout Optimization - Eliminate Horizontal Scrollbar */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100% !important;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 10px;
+        }
+
+        /* =================== BUTTON SYSTEM =================== */
+        .btn {
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+            min-height: 38px !important;
+            font-weight: 600 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition, all 0.2s ease);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Small buttons (Table actions, filter, edit, delete, view, map, close, back, cancel) */
+        .btn-sm,
+        .btn-action-sm,
+        .btn-action-edit,
+        .btn-action-delete,
+        .btn-action-pay,
+        .btn-action-cancel,
+        .btn-filter,
+        .btn-use-location {
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+            border-radius: 7px !important;
+            min-height: 34px !important;
+        }
+
+        /* Medium buttons (Save, Update, Search, Submit, Continue, Confirm, Calculate Route, Apply) */
+        .btn-md,
+        .btn-calc,
+        .portal-btn {
+            padding: 8px 16px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+            min-height: 38px !important;
+        }
+
+        /* Primary action buttons (Book Now, Book Cab, Login, Signup, Register, Proceed to Payment, Update Booking, Confirm Booking) */
+        .btn-lg,
+        .btn-primary-action,
+        .btn-auth,
+        .btn-login,
+        .btn-register,
+        .btn-book-now,
+        .btn-book-confirm,
+        .verify-btn,
+        .ride-btn,
+        .driver-btn {
+            padding: 9px 18px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+            min-height: 40px !important;
+        }
+
+        /* Utility overrides when attached directly to buttons */
+        .btn.py-3,
+        .btn.py-4,
+        .btn.py-3\.5,
+        .btn.py-2\.5 {
+            padding-top: 9px !important;
+            padding-bottom: 9px !important;
+        }
+
+        .btn-sm.py-3,
+        .btn-sm.py-4,
+        .btn-sm.py-2\.5 {
+            padding-top: 6px !important;
+            padding-bottom: 6px !important;
+        }
+
+        .btn.px-5,
+        .btn.px-4 {
+            padding-left: 18px !important;
+            padding-right: 18px !important;
+        }
+
+        .btn-warning {
+            background: var(--primary-green) !important;
+            border: none !important;
+            color: #fff !important;
+            box-shadow: var(--shadow-green);
+        }
+
+        .btn-warning:hover {
+            background: var(--hover-green) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(22, 163, 74, .3);
+        }
+
+        .btn-success {
+            background: var(--primary-green) !important;
+            border-color: var(--primary-green) !important;
+            color: #fff !important;
+        }
+
+        .btn-success:hover {
+            background: var(--hover-green) !important;
+            border-color: var(--hover-green) !important;
+            transform: translateY(-2px);
+        }
+
+        /* =================== CARD =================== */
+        .card {
+            border-radius: var(--radius) !important;
+            border: 1px solid var(--line) !important;
+            box-shadow: var(--shadow-sm);
+            background-color: var(--white);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* =================== INPUT =================== */
+        .form-control,
+        .form-select {
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 1px solid var(--line);
+            background: white;
+            color: var(--ink);
+            transition: var(--transition);
+        }
+
+        .form-control::placeholder {
+            color: var(--muted-2);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 4px var(--green-ring);
+            outline: none;
+        }
+
+        /* =================== NAVBAR =================== */
+        .navbar {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(22, 163, 74, 0.88) 100%) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 10px 0;
+            border-bottom: 2px solid rgba(34, 197, 94, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1050;
+        }
+
+        .navbar-brand {
+            font-family: var(--font-head);
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff !important;
+            letter-spacing: -.75px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand span {
+            color: var(--light-green);
+        }
+
+        .navbar-brand i {
+            color: var(--light-green);
+            margin-right: 6px;
+        }
+
+        .nav-link {
+            color: #CBD5E1 !important;
+            font-weight: 500;
+            margin-left: 12px;
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+            font-size: 14px;
+            position: relative;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #fff !important;
+        }
+
+        .nav-link::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background: var(--light-green);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .btn-login {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 6px 16px !important;
+            border-radius: 8px;
+            color: #fff !important;
+        }
+
+        .btn-login::after {
+            display: none;
+        }
+
+        .btn-login:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #fff;
+        }
+
+        .btn-register {
+            background: var(--primary-green);
+            padding: 6px 18px !important;
+            border-radius: 8px;
+            color: #fff !important;
+        }
+
+        .btn-register::after {
+            display: none;
+        }
+
+        .btn-register:hover {
+            background: var(--hover-green);
+            box-shadow: var(--shadow-green);
+        }
+
+        .navbar-toggler {
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            padding: 5px 9px;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .navbar-toggler:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .navbar-toggler-icon {
+            filter: invert(1);
+        }
+
+        /* Profile dropdown */
+        .profile-toggle {
+            gap: 8px;
+        }
+
+        .profile-toggle::after {
+            display: none;
+        }
+
+        .profile-avatar {
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            background: var(--primary-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            overflow: hidden;
+            border: 1.5px solid var(--light-green);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .profile-avatar img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 15px;
+            text-align: left;
+        }
+
+        .profile-info span {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .profile-info small {
+            font-size: 10px;
+            color: var(--muted-2);
+        }
+
+        .profile-dropdown {
+            background: var(--ink);
+            border: 1px solid var(--ink-800);
+            border-radius: 15px;
+            padding: 10px;
+            min-width: 220px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .35);
+            margin-top: 10px !important;
+        }
+
+        .profile-dropdown .dropdown-item {
+            color: #CBD5E1;
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .profile-dropdown .dropdown-item i {
+            color: var(--light-green);
+            width: 18px;
+        }
+
+        .profile-dropdown .dropdown-item:hover {
+            background: var(--primary-green);
+            color: #fff;
+        }
+
+        .profile-dropdown .dropdown-item:hover i {
+            color: #fff;
+        }
+
+        .logout-btn {
+            color: #F87171 !important;
+        }
+
+        .logout-btn i {
+            color: #F87171 !important;
+        }
+
+        .logout-btn:hover {
+            background: #DC2626 !important;
+            color: #fff !important;
+        }
+
+        .logout-btn:hover i {
+            color: #fff !important;
+        }
+
+        /* =================== LANGUAGE SELECTOR =================== */
+        .lang-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+            transition: var(--transition);
+        }
+
+        .lang-wrapper:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--light-green);
+        }
+
+        .lang-text {
+            color: #E2E8F0;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .lang-text i {
+            color: var(--light-green);
+            font-size: 13px;
+        }
+
+        /* Google Translate Container */
+        #google_translate_element {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Hide default Google text */
+        .goog-te-gadget {
+            font-family: 'Poppins', sans-serif !important;
+            color: transparent !important;
+            font-size: 0 !important;
+        }
+
+        /* Dropdown */
+        .goog-te-combo {
+            width: 105px;
+            height: 30px;
+            padding: 0 6px;
+            border: 1px solid var(--primary-green) !important;
+            border-radius: 7px;
+            background: #1F2937;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+        }
+
+        .goog-te-combo option {
+            background: #111827;
+            color: #FFFFFF;
+        }
+
+        /* Hover & Focus */
+        .goog-te-combo:hover {
+            border-color: var(--light-green) !important;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+        }
+
+        .goog-te-combo:focus {
+            border-color: var(--light-green) !important;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+        }
+
+        /* Hide Google banner & frame overrides */
+        .goog-te-banner-frame.skiptranslate,
+        .goog-te-banner-frame {
+            display: none !important;
+        }
+
+        body {
+            top: 0 !important;
+            position: static !important;
+        }
+
+        .skiptranslate iframe,
+        iframe.goog-te-banner-frame {
+            display: none !important;
+        }
+
+        .goog-logo-link,
+        .goog-te-gadget>span,
+        .goog-te-gadget>div>span {
+            display: none !important;
+        }
+
+        .goog-te-gadget,
+        .goog-te-gadget>div {
+            display: inline-block !important;
+            vertical-align: middle !important;
+        }
+
+        .goog-te-combo {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            width: 105px !important;
+            height: 30px !important;
+            padding: 1px 6px !important;
+            border: 1.5px solid var(--primary-green) !important;
+            border-radius: 7px !important;
+            background: #1F2937 !important;
+            color: #FFFFFF !important;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            font-family: 'Poppins', sans-serif !important;
+            outline: none !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15) !important;
+        }
+
+        #goog-gt-tt,
+        .goog-te-balloon-text {
+            display: none !important;
+        }
+
+        .goog-text-highlight {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* =================== MAIN =================== */
+        main {
+            min-height: calc(100vh - 420px);
+        }
+
+        /* =================== RESPONSIVE MEDIA QUERIES =================== */
+        @media(max-width:991.98px) {
+            body {
+                padding-top: 54px;
+            }
+
+            .navbar-collapse {
+                background: var(--ink);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 20px;
+                border-radius: 16px;
+                margin-top: 12px;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+                max-height: 80vh;
+                overflow-y: auto;
+                animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .nav-link {
+                margin: 6px 0 !important;
+                padding: 10px 14px !important;
+                border-radius: 8px;
+                display: block;
+            }
+
+            .nav-link:hover {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .btn-login,
+            .btn-register {
+                width: 100%;
+                text-align: center;
+                margin-top: 8px;
+                display: block;
+            }
+
+            .profile-info {
+                display: flex;
+            }
+
+            .profile-toggle {
+                justify-content: flex-start;
+                margin: 10px 0;
+                padding: 8px 12px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                width: 100%;
+            }
+
+            .profile-dropdown {
+                width: 100%;
+                margin-top: 6px !important;
+            }
+
+            .lang-wrapper {
+                margin: 10px 0;
+                width: fit-content;
+                max-width: 100%;
+                justify-content: flex-start;
+                padding: 6px 12px;
+            }
+
+            .goog-te-combo {
+                width: 105px !important;
+                height: 30px !important;
+            }
+        }
+
+        @media(max-width:575.98px) {
+            body {
+                padding-top: 50px;
+            }
+
+            .navbar-brand {
+                font-size: 19px;
+            }
+
+            .navbar {
+                padding: 4px 0;
+            }
+
+            .footer-logo {
+                font-size: 24px;
+            }
+
+            footer {
+                padding: 40px 0 20px;
+                margin-top: 40px;
+            }
+        }
+
+        /* =================== FOOTER =================== */
+        footer {
+            background: var(--ink);
+            padding: 60px 0 25px;
+            margin-top: 60px;
+            color: var(--muted-2);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-logo {
+            font-family: var(--font-head);
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -.75px;
+        }
+
+        .footer-logo span {
+            color: var(--light-green);
+        }
+
+        footer h5 {
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 22px;
+        }
+
+        footer p {
+            line-height: 1.8;
+        }
+
+        .footer-links,
+        .footer-contact {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 14px;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: var(--muted-2);
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--light-green);
+            padding-left: 6px;
+        }
+
+        .footer-contact li {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+            align-items: center;
+        }
+
+        .footer-contact i {
+            color: var(--light-green);
+            width: 20px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .footer-social a {
+            height: 42px;
+            width: 42px;
+            background: var(--ink-800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-green);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-social a:hover {
+            background: var(--primary-green);
+            color: #fff;
+            transform: translateY(-4px);
+        }
+
+        footer hr {
+            border-color: rgba(255, 255, 255, 0.08);
+            margin: 32px 0 20px;
+        }
+
+        .copyright {
+            font-size: 14px;
+            color: var(--muted-2);
+        }
+
+        @media(max-width:991px) {
+            footer {
+                text-align: center;
+            }
+
+            .footer-contact li,
+            .footer-social {
+                justify-content: center;
+            }
+        }
+    </style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "y21k5sm8xk");
+</script>
+
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'user/images/logo.png' %}" alt="TaxiGo Logo" height="38" style="object-fit: contain; margin-right: 8px; border-radius: 6px;">Taxi<span>Go</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav ms-auto align-items-center">
+
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'available_cars' %}">Ride</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'driver_home' %}">Drive</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+
+                    {% if user.is_authenticated %}
+
+                    <li class="nav-item"><a class="nav-link" href="{% url 'active_ride' %}">Active Ride</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'user_ride_history' %}">Ride History</a></li>
+
+                    {% endif %}
+
+                    <!-- LANGUAGE SELECTOR -->
+                    <li class="nav-item lang-wrapper">
+                        <span class="lang-text"><i class="fa-solid fa-globe"></i></span>
+                        <div id="google_translate_element"></div>
+                    </li>
+
+                    {% if user.is_authenticated %}
+
+                    <!-- PROFILE DROPDOWN -->
+                    {% load static %}
+
+                    <li class="nav-item dropdown w-100-mobile">
+
+                        <a class="nav-link dropdown-toggle profile-toggle d-flex align-items-center" href="#"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
+                            <div class="profile-avatar">
+
+                                {% if user.is_authenticated %}
+
+                                {% if user.role == "driver" %}
+
+                                {% if user.driver.profile_image %}
+                                <img src="{{ user.driver.profile_image.url }}" class="rounded-circle" width="40"
+                                    height="40" style="object-fit:cover;">
+                                {% else %}
+                                <img src="{% static 'images/default-profile.png' %}" class="rounded-circle" width="40"
+                                    height="40">
+                                {% endif %}
+
+                                {% else %}
+
+                                {% if user.profile_image %}
+                                <img src="{{ user.profile_image.url }}" class="rounded-circle" width="40" height="40"
+                                    style="object-fit:cover;">
+                                {% else %}
+                                <img src="{% static 'images/default-profile.png' %}" class="rounded-circle" width="40"
+                                    height="40">
+                                {% endif %}
+
+                                {% endif %}
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="profile-info">
+                                <span>{{ user.username }}</span>
+                                <small>
+                                    {% if user.role == "driver" %}
+                                    Driver
+                                    {% else %}
+                                    User
+                                    {% endif %}
+                                </small>
+                            </div>
+
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end profile-dropdown">
+
+                            {% if user.role == "driver" %}
+
+                            <li>
+                                <a class="dropdown-item" href="{% url 'driver_profile' %}">
+                                    <i class="fa-solid fa-user"></i> My Profile
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="{% url 'driver_dashboard' %}">
+                                    <i class="fa-solid fa-gauge"></i> Dashboard
+                                </a>
+                            </li>
+
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item logout-btn" href="{% url 'driver_logout' %}">
+                                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                                </a>
+                            </li>
+
+                            {% else %}
+
+                            <li>
+                                <a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="fa-solid fa-user"></i> My Profile
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="{% url 'active_ride' %}">
+                                    <i class="fa-solid fa-car-side"></i> Active Ride
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user_ride_history' %}">
+                                    <i class="fa-solid fa-clock-history"></i> Ride History
+                                </a>
+                            </li>
+
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item logout-btn" href="{% url 'logout' %}">
+                                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                                </a>
+                            </li>
+
+                            {% endif %}
+
+                        </ul>
+
+                    </li>
+                    {% else %}
+
+                    <li class="nav-item"><a class="nav-link btn-login" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link btn-register" href="{% url 'signup' %}">Register</a></li>
+
+                    {% endif %}
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= PAGE CONTENT ================= -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+        <div class="container">
+            <div class="row g-4">
+
+                <div class="col-lg-4 col-md-6">
+                    <h3 class="footer-logo">Taxi<span>Go</span></h3>
+                    <p>Safe &bull; Fast &bull; Affordable Taxi Booking Platform</p>
+                    <p>Your trusted partner for comfortable and secure rides across the city.</p>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'about' %}">About Us</a></li>
+                        <li><a href="{% url 'available_cars' %}">Available Cars</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h5>Contact Us</h5>
+                    <ul class="footer-contact">
+                        <li><i class="fa-solid fa-location-dot"></i>Ahmedabad, Gujarat</li>
+                        <li><i class="fa-solid fa-phone"></i>+91 9876543210</li>
+                        <li><i class="fa-solid fa-envelope"></i>info@taxigo.com</li>
+                    </ul>
+                    <div class="footer-social">
+                        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+            </div>
+            <hr>
+            <p class="text-center copyright">&copy; 2026 TaxiGo. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script src="{% static 'user/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    {% block extra_js %}
+    {% endblock %}
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,gu,mr,bn,ta,te,pa,ur',
+                autoDisplay: false
+            }, 'google_translate_element');
+
+            var checkExist = setInterval(function () {
+                var select = document.querySelector('.goog-te-combo');
+                if (select && select.options && select.options.length > 0) {
+                    select.options[0].text = 'Language';
+                    clearInterval(checkExist);
+                }
+            }, 100);
+        }
+    </script>
+
+
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+
+</html>

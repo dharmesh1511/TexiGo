@@ -1,0 +1,689 @@
+{% extends 'adminpanel/base.html' %}
+
+{% block title %}Vehicles - TaxiGo Admin{% endblock %}
+{% block page %}Vehicle Management{% endblock %}
+
+{% block content %}
+<!-- Google Fonts & Custom Premium CSS -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Premium ThemeForest Styling Scoped for Vehicle Section */
+    .vehicle-section {
+        font-family: 'Poppins', sans-serif;
+        color: #111827;
+    }
+
+    /* Color Constants */
+    :root {
+        --theme-green: #16A34A;
+        --theme-black: #111827;
+        --theme-white: #ffffff;
+        --theme-gray-light: #f9fafb;
+        --theme-gray-border: #e5e7eb;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.4s ease-out forwards;
+    }
+
+    /* Stats Card Styling */
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: #16A34A;
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px -8px rgba(22, 163, 74, 0.12);
+        border-color: #16A34A;
+    }
+
+    .stat-card:hover::before {
+        transform: scaleY(1);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover .stat-icon {
+        transform: scale(1.1);
+    }
+
+    /* Search & Filter Bar */
+    .search-container {
+        position: relative;
+    }
+
+    .search-input {
+        height: 46px;
+        padding-left: 45px;
+        padding-right: 20px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background-color: #ffffff;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        border-color: #16A34A !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+        background-color: #ffffff;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        pointer-events: none;
+        transition: color 0.3s ease;
+    }
+
+    .search-input:focus + .search-icon {
+        color: #16A34A;
+    }
+
+    /* Table Customizations */
+    .custom-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .custom-table {
+        margin-bottom: 0;
+    }
+
+    .custom-table th {
+        background-color: var(--theme-gray-light);
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--theme-gray-border);
+    }
+
+    .custom-table td {
+        padding: 10px 8px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f3f4f6;
+        color: #374151;
+        font-size: 0.875rem;
+    }
+
+    .custom-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .custom-table tbody tr:hover {
+        background-color: #f9fafb !important;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: all 0.2s ease;
+        margin: 0 2px;
+    }
+
+    .btn-action-edit {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: #16A34A;
+    }
+
+    .btn-action-edit:hover {
+        background-color: #16A34A;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .btn-action-delete {
+        background-color: rgba(239, 68, 68, 0.08);
+        color: #ef4444;
+    }
+
+    .btn-action-delete:hover {
+        background-color: #ef4444;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    /* Add Button */
+    .btn-premium-add {
+        background-color: #16A34A;
+        color: #ffffff !important;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 8px 16px;
+        font-size: 14px;
+        min-height: 38px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-premium-add:hover {
+        background-color: #15803D;
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-premium-add:active {
+        transform: translateY(1px);
+    }
+
+    /* License Plate Design Badge */
+    .number-plate-badge {
+        background-color: #f8fafc;
+        color: #0f172a;
+        border: 2px solid #cbd5e1;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        display: inline-block;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Badges */
+    .badge-custom-info {
+        background-color: rgba(59, 130, 246, 0.08);
+        color: #3b82f6;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 0.775rem;
+    }
+
+    .badge-custom-success {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: #16A34A;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 0.775rem;
+    }
+
+    /* Avatar Badge */
+    .avatar-circle {
+        width: 32px;
+        height: 32px;
+        background-color: rgba(22, 163, 74, 0.1);
+        color: #16A34A;
+        font-weight: 700;
+        font-size: 0.85rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        border: 2px solid #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Image Thumbnail Custom style */
+    .vehicle-thumbnail {
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .vehicle-thumbnail:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Custom Confirm Modal styling */
+    .modal-confirm {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .modal-confirm .modal-header {
+        background: #fff;
+        border-bottom: none;
+        padding: 24px 24px 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .modal-confirm .icon-box {
+        width: 56px;
+        height: 56px;
+        background: #fee2e2;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        color: #ef4444;
+        font-size: 24px;
+    }
+
+    .modal-confirm .modal-body {
+        text-align: center;
+        padding: 8px 24px 24px;
+    }
+
+    .modal-confirm .modal-footer {
+        border-top: none;
+        padding: 0 24px 24px;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-secondary-custom {
+        background: #f3f4f6;
+        border: none;
+        color: #4b5563;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary-custom:hover {
+        background: #e5e7eb;
+        color: #1f2937;
+    }
+
+    .btn-danger-custom {
+        background: #ef4444;
+        border: none;
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .btn-danger-custom:hover {
+        background: #dc2626;
+        box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+    }
+</style>
+
+<div class="vehicle-section container-fluid py-4 fade-in-up">
+
+    <!-- Top Registry Header -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="letter-spacing: -0.5px; color: #111827;">🚗 Vehicle Registry</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}" class="text-decoration-none text-muted">Dashboard</a></li>
+                    <li class="breadcrumb-item active text-success fw-semibold" aria-current="page">Vehicles</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="mt-3 mt-sm-0">
+            <a href="{% url 'vehicle_add' %}" class="btn-premium-add text-decoration-none">
+                <i class="bi bi-plus-lg"></i> Add New Vehicle
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards Grid -->
+    <div class="row g-4 mb-4">
+        <!-- Card 1: Total Vehicles -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-semibold small text-uppercase">Total Fleet</span>
+                        <h3 class="fw-bold mb-0 mt-1" style="color: #111827;">{{ vehicles.count }}</h3>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-success small fw-semibold"><i class="bi bi-arrow-up-right me-1"></i>Active units</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Seating Capacity representation (Mock details) -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-semibold small text-uppercase">Active Capacity</span>
+                        <h3 class="fw-bold mb-0 mt-1" style="color: #111827;">4.5 <span class="fs-6 text-muted">avg seats</span></h3>
+                    </div>
+                    <div class="stat-icon" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="small fw-semibold text-muted">Standard passenger sedans</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Fleet Maintenance Rate (Mock representation) -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-semibold small text-uppercase">Health Rate</span>
+                        <h3 class="fw-bold mb-0 mt-1" style="color: #111827;">99.1%</h3>
+                    </div>
+                    <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="bi bi-wrench-adjustable-circle-fill"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="small fw-semibold text-success"><i class="bi bi-shield-check me-1"></i>Passed inspections</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Fleet Insurance Compliance (Mock representation) -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-semibold small text-uppercase">Insured Units</span>
+                        <h3 class="fw-bold mb-0 mt-1" style="color: #111827;">100%</h3>
+                    </div>
+                    <div class="stat-icon" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="bi bi-file-earmark-lock2-fill"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-success small fw-semibold"><i class="bi bi-shield-fill-check me-1"></i>Active coverages</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Table Card -->
+    <div class="custom-card">
+        <!-- Card Header Search and Details -->
+        <div class="p-4 border-bottom border-light d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 bg-white">
+            <div class="search-container flex-grow-1" style="max-width: 400px;">
+                <input type="text"
+                       id="searchInput"
+                       class="form-control search-input"
+                       placeholder="🔍 Search vehicle model, driver, color, number...">
+            </div>
+            <div class="d-flex align-items-center justify-content-between justify-content-md-end gap-3">
+                <span class="text-muted small">Total Found: <span class="fw-bold text-success" id="countDisplay">{{ vehicles.count }}</span></span>
+            </div>
+        </div>
+
+        <!-- Table Responsive Wrapper -->
+        <div class="table-responsive">
+            <table class="table custom-table align-middle" id="vehicleTable">
+                <thead>
+                    <tr>
+                        <th class="text-center" width="60">#</th>
+                        <th>Preview</th>
+                        <th>Driver Info</th>
+                        <th>Model Details</th>
+                        <th>Vehicle Number</th>
+                        <th>Color</th>
+                        <th>Seats</th>
+                        <th>Reg. Number</th>
+                        <th>Insurance No.</th>
+                        <th class="text-end" width="90">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for vehicle in vehicles %}
+                    <tr>
+                        <td class="text-center fw-semibold text-muted">
+                            {{ forloop.counter }}
+                        </td>
+                        <td>
+                            {% if vehicle.car_image %}
+                                <img src="{{ vehicle.car_image.url }}"
+                                     width="58"
+                                     height="38"
+                                     class="vehicle-thumbnail"
+                                     alt="Vehicle image">
+                            {% else %}
+                                <div class="bg-light rounded-3 d-flex align-items-center justify-content-center border" style="width: 58px; height: 38px; color: #9ca3af;">
+                                    <i class="bi bi-car-front fs-5"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-circle">
+                                    <!-- Avatar initials populated by JS -->
+                                </div>
+                                <span class="fw-semibold text-dark driver-name">{{ vehicle.driver.full_name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-dark">{{ vehicle.car_model }}</span>
+                                <small class="text-muted">{{ vehicle.company_name }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="number-plate-badge">
+                                {{ vehicle.vehicle_number }}
+                            </span>
+                        </td>
+                        <td class="text-muted">
+                            {{ vehicle.vehicle_color }}
+                        </td>
+                        <td>
+                            <span class="badge-custom-info">
+                                {{ vehicle.seating_capacity }} Seats
+                            </span>
+                        </td>
+                        <td class="text-muted small">
+                            {{ vehicle.registration_number }}
+                        </td>
+                        <td class="text-muted small">
+                            {{ vehicle.insurance_number }}
+                        </td>
+                        <td class="text-end">
+                            <div class="d-inline-flex">
+                                <a href="{% url 'vehicle_edit' vehicle.id %}"
+                                   class="btn-action btn-action-edit text-decoration-none"
+                                   title="Edit Vehicle">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="#"
+                                   class="btn-action btn-action-delete text-decoration-none delete-trigger"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#deleteConfirmModal"
+                                   data-vehicle-model="{{ vehicle.car_model }}"
+                                   data-delete-url="{% url 'vehicle_delete' vehicle.id %}"
+                                   title="Delete Vehicle">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="10" class="text-center py-5 bg-white">
+                            <div class="py-4">
+                                <div class="mb-4">
+                                    <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="mx-auto">
+                                        <circle cx="60" cy="60" r="50" fill="#f0fdf4" />
+                                        <path d="M40 70V50C40 44.4772 44.4772 40 50 40H70C75.5228 40 80 44.4772 80 50V70C80 75.5228 75.5228 80 70 80H50C44.4772 80 40 75.5228 40 70Z" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="52" cy="70" r="8" fill="#FFFFFF" stroke="#16A34A" stroke-width="3"/>
+                                        <circle cx="68" cy="70" r="8" fill="#FFFFFF" stroke="#16A34A" stroke-width="3"/>
+                                        <path d="M45 52H75" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-2">No Vehicles Registered</h5>
+                                <p class="text-muted mx-auto mb-4" style="max-width: 380px;">
+                                    There are currently no vehicles in the fleet registry. Onboard your first vehicle to assign drivers.
+                                </p>
+                                <a href="{% url 'vehicle_add' %}" class="btn-premium-add text-decoration-none">
+                                    <i class="bi bi-plus-lg"></i> Add First Vehicle
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-confirm border-0 shadow">
+            <div class="modal-header">
+                <div class="icon-box">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h5 class="modal-title fw-bold text-dark w-100" id="deleteConfirmModalLabel">Delete Vehicle Registry?</h5>
+            </div>
+            <div class="modal-body text-muted">
+                <p class="mb-0">Are you sure you want to permanently delete vehicle <strong id="modalVehicleModel" class="text-dark"></strong>?</p>
+                <p class="small text-danger mt-2 mb-0"><i class="bi bi-info-circle-fill me-1"></i> This unit will be unassigned from its active driver.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Cancel</button>
+                <a id="modalConfirmDeleteBtn" href="#" class="btn btn-danger-custom text-decoration-none">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script for dynamic elements and client-side interactions -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Generate initials for driver avatars
+    const vehicleRows = document.querySelectorAll("#vehicleTable tbody tr");
+    vehicleRows.forEach(row => {
+        const nameSpan = row.querySelector(".driver-name");
+        const avatarDiv = row.querySelector(".avatar-circle");
+        
+        if (nameSpan && avatarDiv) {
+            const name = nameSpan.textContent.trim();
+            if (name) {
+                const parts = name.split(" ");
+                let initials = "";
+                if (parts.length > 0 && parts[0]) {
+                    initials += parts[0].charAt(0).toUpperCase();
+                }
+                if (parts.length > 1 && parts[1]) {
+                    initials += parts[1].charAt(0).toUpperCase();
+                } else if (parts[0] && parts[0].length > 1) {
+                    initials = parts[0].substring(0, 2).toUpperCase();
+                }
+                avatarDiv.textContent = initials || "D";
+            } else {
+                avatarDiv.textContent = "D";
+            }
+        }
+    });
+
+    // Delete Modal confirmation binding
+    const deleteTriggers = document.querySelectorAll(".delete-trigger");
+    const modalVehicleModel = document.getElementById("modalVehicleModel");
+    const modalConfirmDeleteBtn = document.getElementById("modalConfirmDeleteBtn");
+
+    deleteTriggers.forEach(trigger => {
+        trigger.addEventListener("click", function () {
+            const vehicleModel = this.getAttribute("data-vehicle-model");
+            const deleteUrl = this.getAttribute("data-delete-url");
+            
+            modalVehicleModel.textContent = vehicleModel;
+            modalConfirmDeleteBtn.setAttribute("href", deleteUrl);
+        });
+    });
+
+    // Client-side search implementation with nice animations
+    const searchInput = document.getElementById("searchInput");
+    const countDisplay = document.getElementById("countDisplay");
+    
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function () {
+            const query = this.value.toLowerCase().trim();
+            const rows = document.querySelectorAll("#vehicleTable tbody tr");
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                // Skip empty states row if it exists
+                if (row.querySelector("td[colspan]")) return;
+
+                const text = row.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    row.style.display = "";
+                    visibleCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            if (countDisplay) {
+                countDisplay.textContent = visibleCount;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,690 @@
+{% extends 'driver/base.html' %}
+
+{% block title %}My Vehicles - TaxiGo{% endblock %}
+
+{% block content %}
+<!-- Google Fonts (Poppins) and Custom Premium Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Scoped Wrapper Styling */
+    .dashboard-wrapper {
+        font-family: 'Poppins', sans-serif !important;
+        color: #111827;
+    }
+
+    /* Color Constants */
+    :root {
+        --theme-green: #2563EB;
+        --theme-green-hover: #1D4ED8;
+        --theme-black: #0F172A;
+        --theme-dark-gray: #0F172A;
+        --theme-light-gray: #F8FAFC;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+        --theme-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Page Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .animate-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.1s; }
+    .delay-3 { animation-delay: 0.15s; }
+
+    /* Custom Breadcrumbs */
+    .custom-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .custom-breadcrumb a {
+        color: var(--theme-green);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .custom-breadcrumb a:hover {
+        color: #15803d;
+    }
+
+    /* Page Header */
+    .header-section {
+        margin-bottom: 2rem;
+    }
+    .header-section h2 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        color: var(--theme-black);
+        margin: 0;
+    }
+    .header-section p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+        margin-top: 0.25rem;
+    }
+
+    /* KPI Stats Cards */
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid var(--theme-border);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--theme-shadow);
+        height: 100%;
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--theme-shadow-lg) !important;
+        border-color: var(--theme-green);
+    }
+    .stat-icon-wrapper {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        transition: all 0.3s ease;
+    }
+    .stat-icon-green {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+    }
+    .stat-icon-black {
+        background-color: rgba(17, 24, 39, 0.06);
+        color: var(--theme-black);
+    }
+
+    /* Main Table Panel */
+    .premium-card {
+        background: #ffffff;
+        border: 1px solid var(--theme-border) !important;
+        border-radius: 18px !important;
+        box-shadow: var(--theme-shadow-lg) !important;
+        overflow: hidden;
+    }
+
+    /* Toolbar Utilities */
+    .search-wrapper {
+        position: relative;
+        max-width: 320px;
+    }
+    .search-wrapper .bi-search {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.95rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+    .search-input-premium {
+        padding-left: 44px;
+        height: 44px;
+        border-radius: 10px;
+        border: 1.5px solid var(--theme-border);
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background-color: var(--theme-light-gray);
+    }
+    .search-input-premium:focus {
+        background-color: #ffffff;
+        border-color: var(--theme-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+    }
+    .search-input-premium:focus + .bi-search {
+        color: var(--theme-green);
+    }
+
+    /* Add Button Override */
+    .btn-theme-primary {
+        background: var(--theme-green);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 10px 18px;
+        font-size: 0.875rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
+    }
+    .btn-theme-primary:hover {
+        background: var(--theme-green-hover);
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 14px rgba(22, 163, 74, 0.25);
+    }
+
+    /* Premium Table layout */
+    .premium-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+    .premium-table thead th {
+        background-color: var(--theme-light-gray);
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--theme-border);
+    }
+    .premium-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid var(--theme-border);
+    }
+    .premium-table tbody tr:hover {
+        background-color: rgba(22, 163, 74, 0.01) !important;
+    }
+    .premium-table td {
+        padding: 10px 8px;
+        color: #374151;
+        font-size: 14px;
+        border: none;
+    }
+
+    /* Vehicle Car Image container */
+    .vehicle-img-container {
+        position: relative;
+        width: 58px;
+        height: 38px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 0 auto;
+        border: 1px solid var(--theme-border);
+        transition: all 0.3s ease;
+        background-color: #ffffff;
+    }
+    .vehicle-img-container:hover {
+        transform: scale(1.08);
+        border-color: var(--theme-green);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+    .vehicle-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    .no-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background-color: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        color: #9ca3af;
+        font-weight: 500;
+    }
+
+    /* Vehicle license plate styled badge */
+    .license-plate {
+        background-color: #f3f4f6;
+        border: 1.5px solid #d1d5db;
+        color: var(--theme-black);
+        font-weight: 700;
+        font-size: 0.775rem;
+        padding: 6px 12px;
+        border-radius: 6px;
+        letter-spacing: 0.06em;
+        display: inline-block;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+        border-left: 4px solid var(--theme-green);
+    }
+
+    .seats-badge {
+        background-color: rgba(17, 24, 39, 0.05);
+        color: var(--theme-black);
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 5px 12px;
+        border-radius: 30px;
+        display: inline-block;
+    }
+
+    /* Edit Button Styling */
+    .btn-action-edit {
+        color: #d97706;
+        background-color: rgba(217, 119, 6, 0.08);
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(217, 119, 6, 0.15);
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    .btn-action-edit:hover {
+        background-color: #d97706;
+        color: #ffffff !important;
+        box-shadow: 0 4px 10px rgba(217, 119, 6, 0.25);
+    }
+
+    /* Delete Button Styling */
+    .btn-action-delete {
+        color: #dc2626;
+        background-color: rgba(220, 38, 38, 0.08);
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(220, 38, 38, 0.15);
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    .btn-action-delete:hover {
+        background-color: #dc2626;
+        color: #ffffff !important;
+        box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
+    }
+
+    /* Pagination Footer */
+    .premium-card-footer {
+        background: #ffffff;
+        border-top: 1px solid var(--theme-border);
+        padding: 20px 24px;
+    }
+
+    /* Empty state */
+    .empty-state-container {
+        padding: 64px 32px;
+        text-align: center;
+        background: #ffffff;
+        border: 1px solid var(--theme-border);
+        border-radius: 18px;
+        box-shadow: var(--theme-shadow);
+    }
+    .empty-state-icon {
+        font-size: 3.5rem;
+        color: var(--theme-green);
+        margin-bottom: 24px;
+        display: inline-block;
+        animation: float 2.5s ease-in-out infinite;
+    }
+    .empty-state-title {
+        font-weight: 700;
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+        color: var(--theme-black);
+    }
+    .empty-state-text {
+        color: #6b7280;
+        max-width: 420px;
+        margin: 0 auto 24px auto;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+
+    /* Responsive Styling Adjustments */
+    @media (max-width: 991.98px) {
+        .dashboard-wrapper {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+    }
+    
+    @media (max-width: 767.98px) {
+        .header-section {
+            margin-bottom: 1.5rem;
+        }
+        .header-section h2 {
+            font-size: 1.5rem;
+        }
+        .header-section p {
+            font-size: 0.85rem;
+        }
+        .stat-card {
+            padding: 16px;
+        }
+        .stat-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            font-size: 18px;
+        }
+        .premium-card-header {
+            padding: 16px 20px !important;
+        }
+        .premium-table thead th {
+            padding: 14px 16px;
+            font-size: 0.7rem;
+        }
+        .premium-table td {
+            padding: 14px 16px;
+            font-size: 13px;
+        }
+        .btn-action-edit, .btn-action-delete {
+            padding: 5px 10px;
+            font-size: 0.75rem;
+        }
+        .vehicle-thumbnail {
+            width: 50px;
+            height: 35px;
+        }
+    }
+</style>
+
+<div class="container-fluid py-3 dashboard-wrapper px-4">
+
+    <!-- Custom Navigation Breadcrumbs -->
+    <nav class="custom-breadcrumb animate-up" aria-label="breadcrumb">
+        <a href="{% url 'driver_dashboard' %}">Dashboard</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <span class="text-dark">My Garage</span>
+    </nav>
+
+    <!-- Page Header Section -->
+    <div class="header-section d-flex justify-content-between align-items-center animate-up delay-1">
+        <div>
+            <h2>🚗 My Vehicles</h2>
+            <p>Manage and keep track of all your registered units</p>
+        </div>
+    </div>
+
+    {% if vehicles %}
+        <!-- Dashboard Statistics Cards Row -->
+        <div class="row g-4 mb-4 animate-up delay-2">
+            <!-- Stat card: Total Vehicles -->
+            <div class="col-12 col-md-4">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small fw-bold text-uppercase tracking-wider">Total Fleet</span>
+                            <h3 class="mb-0 mt-2 fw-bold text-dark">{{ vehicles.count }}</h3>
+                            <p class="text-success small mb-0 mt-2 fw-medium">
+                                <i class="bi bi-check-circle-fill me-1"></i> Registered Units
+                            </p>
+                        </div>
+                        <div class="stat-icon-wrapper stat-icon-green">
+                            <i class="bi bi-car-front-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat card: Capacity -->
+            <div class="col-12 col-md-4">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small fw-bold text-uppercase tracking-wider">Total Seating</span>
+                            <h3 class="mb-0 mt-2 fw-bold text-dark" id="totalSeatsVal">0</h3>
+                            <p class="text-muted small mb-0 mt-2">
+                                Combined seating capacity
+                            </p>
+                        </div>
+                        <div class="stat-icon-wrapper stat-icon-black">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat card: Fleet Status -->
+            <div class="col-12 col-md-4">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small fw-bold text-uppercase tracking-wider">Fleet Status</span>
+                            <h3 class="mb-0 mt-2 fw-bold text-success">Active</h3>
+                            <p class="text-muted small mb-0 mt-2 d-flex align-items-center">
+                                <span class="d-inline-block bg-success rounded-circle me-1.5" style="width: 8px; height: 8px; animation: pulse 1.8s infinite;"></span>
+                                Fully Operational
+                            </p>
+                        </div>
+                        <div class="stat-icon-wrapper stat-icon-green">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicles Table & Controls Card -->
+        <div class="card premium-card animate-up delay-3 border-0">
+            <div class="premium-card-header bg-white py-3 px-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                    
+                    <!-- Search Wrapper -->
+                    <div class="search-wrapper w-100">
+                        <input type="text"
+                               id="searchInput"
+                               class="form-control search-input-premium"
+                               placeholder="Search vehicle model, company, number...">
+                        <i class="bi bi-search"></i>
+                    </div>
+
+                    <!-- Actions and Count -->
+                    <div class="d-flex align-items-center gap-3 w-100 w-md-auto justify-content-between justify-content-md-end">
+                        <div class="text-md-end">
+                            <span class="text-muted small fw-bold d-block text-uppercase tracking-wider">Filtered Fleet</span>
+                            <span class="badge bg-dark px-3 py-1.5 rounded-3 fw-semibold">
+                                {{ vehicles.count }}
+                            </span>
+                        </div>
+
+                        <a href="{% url 'driver_vehicle_add' %}" class="btn btn-theme-primary d-inline-flex align-items-center">
+                            <i class="bi bi-plus-lg me-2"></i> Add Vehicle
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Table Block -->
+            <div class="table-responsive">
+                <table class="table premium-table align-middle text-center" id="vehicleTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">#</th>
+                            <th style="width: 120px;">Image</th>
+                            <th>Company</th>
+                            <th>Model</th>
+                            <th>Vehicle Number</th>
+                            <th>Color</th>
+                            <th>Seats</th>
+                            <th style="width: 140px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vehicle in vehicles %}
+                            <tr>
+                                <td class="fw-medium text-secondary">{{ forloop.counter }}</td>
+                                <td>
+                                    <div class="vehicle-img-container">
+                                        {% if vehicle.car_image %}
+                                            <img src="{{ vehicle.car_image.url }}" class="vehicle-img" alt="Vehicle Image">
+                                        {% else %}
+                                            <div class="no-image-placeholder">
+                                                <span>No Image</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="fw-semibold text-dark">{{ vehicle.company_name }}</td>
+                                <td class="text-dark">{{ vehicle.car_model }}</td>
+                                <td>
+                                    <span class="license-plate">
+                                        {{ vehicle.vehicle_number }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-capitalize">{{ vehicle.vehicle_color }}</span>
+                                </td>
+                                <td>
+                                    <span class="seats-badge">
+                                        {{ vehicle.seating_capacity }} Seats
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{% url 'driver_vehicle_edit' vehicle.id %}" class="btn btn-action-edit d-inline-flex align-items-center">
+                                            <i class="bi bi-pencil-square me-1"></i> Edit
+                                        </a>
+                                        <a href="{% url 'driver_vehicle_delete' vehicle.id %}" 
+                                           class="btn btn-action-delete d-inline-flex align-items-center"
+                                           data-vehicle-name="{{ vehicle.company_name }} {{ vehicle.car_model }}">
+                                            <i class="bi bi-trash3-fill me-1"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        
+                        <!-- Empty Search Result Row -->
+                        <tr id="noResultsRow" style="display: none;">
+                            <td colspan="8" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="bi bi-search mb-3" style="font-size: 2.5rem; color: #cbd5e1; display: block;"></i>
+                                    <h5 class="fw-bold text-dark">No matching vehicles found</h5>
+                                    <p class="small mb-0">Try checking your spelling or adjusting your keywords</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State UI -->
+        <div class="empty-state-container animate-up delay-2">
+            <div class="empty-state-icon">
+                <i class="bi bi-car-front"></i>
+            </div>
+            <h4 class="empty-state-title">Your Garage is Empty</h4>
+            <p class="empty-state-text">You don't have any registered vehicles yet. Add a vehicle to get verified and start receiving ride requests.</p>
+            <a href="{% url 'driver_vehicle_add' %}" class="btn btn-theme-primary px-4 py-2.5 d-inline-flex align-items-center">
+                <i class="bi bi-plus-lg me-2"></i> Register Your First Vehicle
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-bottom-0 bg-dark text-white py-3 px-4" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                <h5 class="modal-title fw-bold" id="deleteConfirmModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4 px-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-danger-subtle text-danger rounded-circle p-3 me-3" style="width: 54px; height: 54px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Remove Vehicle</h6>
+                        <p class="text-muted small mb-0" id="deleteModalBodyText">Are you sure you want to delete this vehicle? This action cannot be undone.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0 py-3 px-4">
+                <button type="button" class="btn btn-light fw-semibold px-3 py-2" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                <a href="#" id="confirmDeleteBtn" class="btn btn-danger fw-semibold px-4 py-2" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);">Yes, Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Dynamic seating capacity aggregation on load
+    const seatsCells = document.querySelectorAll("#vehicleTable tbody tr:not(#noResultsRow) td span.seats-badge");
+    let totalSeats = 0;
+    seatsCells.forEach(function(span) {
+        let val = parseInt(span.textContent.replace("Seats", "").trim());
+        if (!isNaN(val)) {
+            totalSeats += val;
+        }
+    });
+    const totalSeatsVal = document.getElementById("totalSeatsVal");
+    if (totalSeatsVal) {
+        totalSeatsVal.textContent = totalSeats;
+    }
+
+    // Interactive Search Filtering
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function() {
+            let value = this.value.toLowerCase().trim();
+            let rows = document.querySelectorAll("#vehicleTable tbody tr:not(#noResultsRow)");
+            let matches = 0;
+
+            rows.forEach(function(row) {
+                let text = row.innerText.toLowerCase();
+                if (text.includes(value)) {
+                    row.style.display = "";
+                    matches++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            let noResultsRow = document.getElementById("noResultsRow");
+            if (noResultsRow) {
+                noResultsRow.style.display = (matches === 0 && rows.length > 0) ? "" : "none";
+            }
+        });
+    }
+
+    // Modal Confirmation Hijack for Delete Button
+    const deleteButtons = document.querySelectorAll(".btn-action-delete");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+    const deleteModalBodyText = document.getElementById("deleteModalBodyText");
+    const deleteModalElement = document.getElementById('deleteConfirmModal');
+
+    if (deleteButtons.length > 0 && confirmDeleteBtn && deleteModalBodyText && deleteModalElement) {
+        const deleteModal = new bootstrap.Modal(deleteModalElement);
+
+        deleteButtons.forEach(function(button) {
+            button.addEventListener("click", function(e) {
+                e.preventDefault();
+                let url = this.getAttribute("href");
+                let name = this.getAttribute("data-vehicle-name") || "this vehicle";
+                
+                deleteModalBodyText.innerHTML = `Are you sure you want to delete <strong>${name}</strong>? This action will permanently remove it from your records.`;
+                confirmDeleteBtn.setAttribute("href", url);
+                
+                deleteModal.show();
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

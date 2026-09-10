@@ -1,0 +1,678 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+{% block content %}
+<!-- Google Fonts (Poppins & Inter) and Custom Premium Styles -->
+<link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+<style>
+    /* Scoped Wrapper Styling */
+    .dashboard-wrapper {
+        font-family: 'Inter', sans-serif !important;
+        color: #1f2937;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Color Constants */
+    :root {
+        --theme-green: #16A34A;
+        --theme-green-hover: #15803D;
+        --theme-black: #111827;
+        --theme-dark-gray: #1F2937;
+        --theme-white: #ffffff;
+        --theme-gray-light: #f9fafb;
+        --theme-gray-border: #e5e7eb;
+        --theme-success: #16A34A;
+        --theme-warning: #f59e0b;
+        --theme-info: #3b82f6;
+    }
+
+    /* Page Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+    }
+
+    .delay-1 {
+        animation-delay: 0.05s;
+    }
+
+    .delay-2 {
+        animation-delay: 0.1s;
+    }
+
+    .delay-3 {
+        animation-delay: 0.15s;
+    }
+
+    /* KPI Stats Card Widgets */
+    .stat-card-premium {
+        background: var(--theme-white);
+        border: 1px solid var(--theme-gray-border);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-card-premium:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -4px rgba(17, 24, 39, 0.08);
+        border-color: var(--theme-green);
+    }
+
+    .stat-card-premium .stat-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+
+    .stat-card-premium .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--theme-black);
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+
+    .stat-icon-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card-premium:hover .stat-icon-box {
+        transform: scale(1.1);
+    }
+
+    /* Earning KPI Cards Design */
+    .card-earning-dark {
+        background: linear-gradient(135deg, var(--theme-black) 0%, #1f2937 100%);
+        color: var(--theme-white) !important;
+        border: none;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        padding: 24px;
+        box-shadow: 0 10px 20px rgba(17, 24, 39, 0.12);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .card-earning-dark:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 28px rgba(17, 24, 39, 0.2);
+    }
+
+    .card-earning-dark::after {
+        content: "";
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        background: radial-gradient(circle, rgba(22, 163, 74, 0.25) 0%, rgba(22, 163, 74, 0) 70%);
+        top: -40px;
+        right: -40px;
+        pointer-events: none;
+    }
+
+    .card-earning-dark .stat-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        margin-bottom: 8px;
+    }
+
+    .card-earning-dark .stat-val {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--theme-white);
+        letter-spacing: -0.5px;
+    }
+
+    .card-earning-dark .stat-subtext {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-top: 4px;
+    }
+
+    .icon-box-green {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+    }
+
+    .icon-box-black {
+        background-color: rgba(17, 24, 39, 0.06);
+        color: var(--theme-black);
+    }
+
+    .icon-box-blue {
+        background-color: rgba(59, 130, 246, 0.08);
+        color: #3b82f6;
+    }
+
+    .icon-box-yellow {
+        background-color: rgba(245, 158, 11, 0.08);
+        color: #f59e0b;
+    }
+
+    /* Custom Border Accents on Booking Stats */
+    .border-accent-black {
+        border-left: 4px solid var(--theme-black);
+    }
+
+    .border-accent-yellow {
+        border-left: 4px solid var(--theme-warning);
+    }
+
+    .border-accent-green {
+        border-left: 4px solid var(--theme-green);
+    }
+
+    .border-accent-blue {
+        border-left: 4px solid var(--theme-info);
+    }
+
+    /* Custom Breadcrumbs */
+    .custom-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .custom-breadcrumb a {
+        color: var(--theme-green);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .custom-breadcrumb a:hover {
+        color: var(--theme-green-hover);
+    }
+
+    /* Page Header */
+    .header-section {
+        margin-bottom: 2rem;
+    }
+
+    .header-section h2 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        color: var(--theme-black);
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+
+    .header-section p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+        margin-top: 0.25rem;
+    }
+
+    /* Main Table Panel */
+    .premium-card {
+        background: var(--theme-white);
+        border: 1px solid var(--theme-gray-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        overflow: hidden;
+    }
+
+    .premium-card-header {
+        background: #ffffff !important;
+        border-bottom: 1px solid var(--theme-gray-border) !important;
+        padding: 20px 24px;
+        border: none;
+    }
+
+    .premium-card-header h5 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--theme-black);
+    }
+
+    /* Toolbar Utilities */
+    .search-wrapper {
+        position: relative;
+        max-width: 320px;
+    }
+
+    .search-wrapper .bi-search {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.95rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+
+    .search-input-premium {
+        padding-left: 44px;
+        height: 44px;
+        border-radius: 10px;
+        border: 1.5px solid var(--theme-gray-border);
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background-color: var(--theme-gray-light);
+    }
+
+    .search-input-premium:focus {
+        background-color: var(--theme-white);
+        border-color: var(--theme-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+    }
+
+    .search-input-premium:focus+.bi-search {
+        color: var(--theme-green);
+    }
+
+    /* Premium Table layout */
+    .premium-table {
+        margin-bottom: 0;
+    }
+
+    .premium-table thead th {
+        background-color: var(--theme-gray-light);
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 10px 8px;
+        border-bottom: 1.5px solid var(--theme-gray-border);
+    }
+
+    .premium-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid var(--theme-gray-border);
+    }
+
+    .premium-table tbody tr:hover {
+        background-color: rgba(22, 163, 74, 0.01) !important;
+    }
+
+    .premium-table td {
+        padding: 10px 8px;
+        color: #374151;
+        font-size: 0.875rem;
+        border: none;
+        vertical-align: middle;
+    }
+
+    /* Table Details columns */
+    .user-tag {
+        font-weight: 600;
+        color: var(--theme-black);
+    }
+
+    .vehicle-tag {
+        font-weight: 600;
+        color: var(--theme-black);
+    }
+
+    .location-text {
+        font-size: 0.825rem;
+        color: #4b5563;
+        max-width: 170px;
+        word-wrap: break-word;
+        text-align: left;
+    }
+
+    .fare-text {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--theme-green);
+    }
+
+    /* Status Badges */
+    .status-badge {
+        font-weight: 600;
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        border-radius: 9999px;
+        display: inline-block;
+        letter-spacing: 0.02em;
+        border: 1px solid transparent;
+    }
+
+    .status-pending {
+        background-color: rgba(245, 158, 11, 0.08);
+        color: #d97706;
+        border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    .status-confirmed {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+        border-color: rgba(22, 163, 74, 0.2);
+    }
+
+    .status-completed {
+        background-color: rgba(59, 130, 246, 0.08);
+        color: #2563eb;
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+
+    .status-cancelled {
+        background-color: rgba(239, 68, 68, 0.08);
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    /* Footer styling */
+    .premium-card-footer {
+        background: var(--theme-white);
+        border-top: 1px solid var(--theme-gray-border);
+        padding: 20px 24px;
+    }
+</style>
+
+<div class="container-fluid py-2 dashboard-wrapper">
+
+    <!-- Custom Navigation Breadcrumbs -->
+    <nav class="custom-breadcrumb animate-up" aria-label="breadcrumb">
+        <a href="#">Admin</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <span class="text-dark">Dashboard</span>
+    </nav>
+
+    <!-- Page Header Section -->
+    <div class="header-section d-flex justify-content-between align-items-center animate-up delay-1">
+        <div>
+            <h2>📊 Admin Dashboard</h2>
+            <p>Monitor platform statistics, revenue, registrations, and booking logs</p>
+        </div>
+    </div>
+
+    <!-- Row 1: Core Metrics -->
+    <div class="row g-3 mb-4 animate-up delay-2">
+        <!-- Widget 1: Total Users -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card-premium">
+                <div>
+                    <div class="stat-title">Total Users</div>
+                    <h3 class="stat-number">{{ total_users }}</h3>
+                </div>
+                <div class="stat-icon-box icon-box-black">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget 2: Total Drivers -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card-premium">
+                <div>
+                    <div class="stat-title">Total Drivers</div>
+                    <h3 class="stat-number">{{ total_drivers }}</h3>
+                </div>
+                <div class="stat-icon-box icon-box-green">
+                    <i class="bi bi-person-badge-fill"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget 3: Total Vehicles -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card-premium">
+                <div>
+                    <div class="stat-title">Total Vehicles</div>
+                    <h3 class="stat-number">{{ total_vehicles }}</h3>
+                </div>
+                <div class="stat-icon-box icon-box-green">
+                    <i class="bi bi-car-front-fill"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widget 4: Total Revenue -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card-earning-dark">
+                <div>
+                    <span class="stat-label">Total Revenue</span>
+                    <h3 class="stat-val mb-0 mt-2">₹ {{ total_revenue|floatformat:2 }}</h3>
+                </div>
+                <span class="stat-subtext">Overall cumulative earnings</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Booking Status Overview -->
+    <div class="row g-3 mb-4 animate-up delay-3">
+        <!-- Card 1: Total Bookings -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card-premium border-accent-black py-3">
+                <div>
+                    <div class="stat-title">Total Bookings</div>
+                    <h4 class="fw-bold mb-0 text-dark">{{ total_bookings }}</h4>
+                </div>
+                <div class="stat-icon-box icon-box-black" style="width: 44px; height: 44px; font-size: 18px;">
+                    <i class="bi bi-receipt-cutoff"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Pending Bookings -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card-premium border-accent-yellow py-3">
+                <div>
+                    <div class="stat-title">Pending Requests</div>
+                    <h4 class="fw-bold mb-0 text-warning">{{ pending_bookings }}</h4>
+                </div>
+                <div class="stat-icon-box icon-box-yellow" style="width: 44px; height: 44px; font-size: 18px;">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Confirmed Bookings -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card-premium border-accent-green py-3">
+                <div>
+                    <div class="stat-title">Confirmed Rides</div>
+                    <h4 class="fw-bold mb-0 text-success">{{ confirmed_bookings }}</h4>
+                </div>
+                <div class="stat-icon-box icon-box-green" style="width: 44px; height: 44px; font-size: 18px;">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Completed Bookings -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card-premium border-accent-blue py-3">
+                <div>
+                    <div class="stat-title">Completed Trips</div>
+                    <h4 class="fw-bold mb-0 text-primary">{{ completed_bookings }}</h4>
+                </div>
+                <div class="stat-icon-box icon-box-blue" style="width: 44px; height: 44px; font-size: 18px;">
+                    <i class="bi bi-shield-fill-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings Table Panel -->
+    <div class="card premium-card animate-up delay-3">
+        <!-- Card Header Toolbar -->
+        <div class="premium-card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h5 class="mb-0">Recent Bookings</h5>
+            <div class="search-wrapper w-100 w-sm-50">
+                <input type="text" id="searchInput" class="form-control search-input-premium"
+                    placeholder="Filter bookings by user, vehicle, status...">
+                <i class="bi bi-search"></i>
+            </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body p-0">
+            {% if recent_bookings %}
+            <div class="table-responsive">
+                <table class="table premium-table align-middle text-center" id="bookingTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Vehicle</th>
+                            <th>Pickup Location</th>
+                            <th>Drop Location</th>
+                            <th>Fare</th>
+                            <th>Status</th>
+                            <th style="width: 150px;">Booking Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in recent_bookings %}
+                        <tr>
+                            <td>
+                                <span class="user-tag">{{ booking.user.username }}</span>
+                            </td>
+                            <td>
+                                <span class="vehicle-tag">{{ booking.vehicle.company_name }}</span>
+                            </td>
+                            <td>
+                                <div class="location-text d-inline-flex align-items-start gap-1">
+                                    <i class="bi bi-geo-alt-fill text-danger mt-1"></i>
+                                    <span>{{ booking.pickup_location }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="location-text d-inline-flex align-items-start gap-1">
+                                    <i class="bi bi-pin-map-fill text-success mt-1"></i>
+                                    <span>{{ booking.drop_location }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fare-text">₹ {{ booking.total_fare }}</span>
+                            </td>
+                            <td>
+                                {% if booking.status == "Pending" %}
+                                <span class="status-badge status-pending">
+                                    Pending
+                                </span>
+                                {% elif booking.status == "Confirmed" %}
+                                <span class="status-badge status-confirmed">
+                                    Confirmed
+                                </span>
+                                {% elif booking.status == "Completed" %}
+                                <span class="status-badge status-completed">
+                                    Completed
+                                </span>
+                                {% else %}
+                                <span class="status-badge status-cancelled">
+                                    Cancelled
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="fw-medium text-dark">{{ booking.booking_datetime|date:"d M Y" }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        <!-- Empty Search Result Placeholder Row -->
+                        <tr id="noResultsRow" style="display: none;">
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="bi bi-search mb-3 text-secondary"
+                                        style="font-size: 2.5rem; display: block;"></i>
+                                    <h5 class="fw-bold text-dark">No matching bookings found</h5>
+                                    <p class="small mb-0">Try checking details or status terms</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x mb-2 text-secondary" style="font-size: 2.5rem; display: block;"></i>
+                <h5 class="fw-bold text-dark">No Bookings Found</h5>
+                <p class="small mb-0">Active platform logs will display here once transactions occur</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Instant Interactive Search Filtering
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) {
+            searchInput.addEventListener("keyup", function () {
+                let value = this.value.toLowerCase().trim();
+                let rows = document.querySelectorAll("#bookingTable tbody tr:not(#noResultsRow)");
+                let matches = 0;
+
+                rows.forEach(function (row) {
+                    let text = row.innerText.toLowerCase();
+                    if (text.includes(value)) {
+                        row.style.display = "";
+                        matches++;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                let noResultsRow = document.getElementById("noResultsRow");
+                if (noResultsRow) {
+                    noResultsRow.style.display = (matches === 0 && rows.length > 0) ? "" : "none";
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

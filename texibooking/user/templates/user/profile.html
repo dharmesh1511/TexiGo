@@ -1,0 +1,472 @@
+{% extends 'user/base.html' %}
+
+{% block title %}
+My Profile - TaxiGo
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /*====================== PROFILE GLOBAL SYSTEM ======================*/
+    :root {
+        --theme-green: #2563EB;
+        --theme-green-hover: #1D4ED8;
+        --theme-black: #0F172A;
+        --theme-dark-gray: #0F172A;
+        --theme-light-gray: #F8FAFC;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+        --theme-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    body {
+        background-color: var(--theme-light-gray);
+    }
+
+    /* Common Card Styling */
+    .card {
+        border: 1px solid var(--theme-border) !important;
+        border-radius: 16px !important;
+        box-shadow: var(--theme-shadow) !important;
+        background-color: #ffffff;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--theme-shadow-lg) !important;
+    }
+
+    .card-header {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid var(--theme-border) !important;
+        padding: 20px 24px !important;
+    }
+
+    .card-header h4 {
+        font-family: 'Poppins', sans-serif;
+        color: var(--theme-black) !important;
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* Buttons Override */
+    .btn {
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn:active {
+        transform: scale(0.98);
+    }
+    .btn-success {
+        background-color: var(--theme-green) !important;
+        border-color: var(--theme-green) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+    }
+    .btn-success:hover {
+        background-color: var(--theme-green-hover) !important;
+        border-color: var(--theme-green-hover) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.25);
+    }
+
+    /* Profile Avatar */
+    .profile-avatar-placeholder {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background-color: var(--theme-black);
+        color: var(--theme-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 4px solid var(--theme-border);
+        box-shadow: var(--theme-shadow);
+        font-size: 64px;
+        font-weight: 800;
+        font-family: 'Poppins', sans-serif;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+    }
+    .profile-avatar-placeholder:hover {
+        transform: scale(1.03);
+        border-color: var(--theme-green);
+    }
+
+    .profile-avatar-img {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #ffffff;
+        box-shadow: var(--theme-shadow);
+        transition: all 0.3s ease;
+    }
+    .profile-avatar-img:hover {
+        transform: scale(1.03);
+        border-color: var(--theme-green);
+    }
+
+    /* Badges */
+    .badge {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .badge.bg-success {
+        background-color: rgba(22, 163, 74, 0.08) !important;
+        color: #16a34a !important;
+        border: 1px solid rgba(22, 163, 74, 0.15) !important;
+    }
+    .badge.bg-dark {
+        background-color: var(--theme-light-gray) !important;
+        color: var(--theme-dark-gray) !important;
+        border: 1px solid var(--theme-border) !important;
+    }
+
+    /* List group */
+    .list-group-item {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--theme-border) !important;
+        transition: all 0.2s ease;
+    }
+    .list-group-item:hover {
+        background-color: var(--theme-light-gray) !important;
+    }
+
+    /* Stat Box Icons */
+    .stat-circle-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+</style>
+
+<!-- ============================
+        PROFILE HERO SECTION
+================================ -->
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row align-items-center g-4">
+                
+                <!-- Profile Image -->
+                <div class="col-lg-3 text-center">
+                    {% if request.user.profile_image %}
+                        <img src="{{ request.user.profile_image.url }}"
+                             class="profile-avatar-img"
+                             alt="{{ request.user.username }}">
+                    {% else %}
+                        <div class="profile-avatar-placeholder">
+                            {{ request.user.username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- User Info -->
+                <div class="col-lg-6 text-lg-start text-center">
+                    <h2 class="fw-bold mb-1 text-dark" style="font-family: 'Poppins', sans-serif; font-size: 32px; letter-spacing: -1px;">
+                        {{ request.user.username }}
+                    </h2>
+                    <p class="text-muted fs-5 mb-3">
+                        {{ request.user.email }}
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2 justify-content-lg-start justify-content-center">
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle-fill me-1"></i> Active User
+                        </span>
+                        <span class="badge bg-dark">
+                            <i class="bi bi-calendar-event me-1"></i> Member since {{ request.user.date_joined|date:"d M Y" }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-lg-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'user_edit_profile' %}" class="btn btn-success py-3">
+                            <i class="bi bi-pencil-square me-2"></i> Edit Profile
+                        </a>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger py-3">
+                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- =========================================
+            PROFILE STATISTICS
+========================================== -->
+
+<div class="container-fluid px-4">
+
+    <!-- Statistics Grid -->
+    <div class="row g-4 mb-4">
+        
+        <!-- Status -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card border-0 shadow rounded-4 h-100">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="stat-circle-box" style="background: rgba(22, 163, 74, 0.08); color: var(--theme-green);">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                    <div class="ms-3">
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Account Status</small>
+                        <h4 class="fw-bold mb-0 text-dark">Active</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Joined Date -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card border-0 shadow rounded-4 h-100">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="stat-circle-box" style="background: rgba(17, 24, 39, 0.05); color: var(--theme-black);">
+                        <i class="bi bi-calendar-event-fill"></i>
+                    </div>
+                    <div class="ms-3">
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Joined</small>
+                        <h5 class="fw-bold mb-0 text-dark">{{ request.user.date_joined|date:"d M Y" }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification -->
+        <div class="col-lg-4 col-md-12">
+            <div class="card border-0 shadow rounded-4 h-100">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="stat-circle-box" style="background: rgba(59, 130, 246, 0.08); color: #2563eb;">
+                        <i class="bi bi-envelope-check-fill"></i>
+                    </div>
+                    <div class="ms-3">
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">Email Status</small>
+                        <h5 class="fw-bold mb-0 text-dark">Verified</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Personal Information Card -->
+    <div class="card border-0 shadow-lg rounded-4 mb-4">
+        <div class="card-header py-3">
+            <h4>
+                <i class="bi bi-person-vcard-fill me-2 text-success"></i> Personal Information
+            </h4>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row g-4">
+                
+                <!-- Username -->
+                <div class="col-lg-6">
+                    <div class="card border rounded-4 h-100 bg-light bg-opacity-25" style="border: 1px solid var(--theme-border) !important;">
+                        <div class="card-body">
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Username</small>
+                            <h5 class="fw-bold mt-2 text-dark mb-0">{{ request.user.username }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-lg-6">
+                    <div class="card border rounded-4 h-100 bg-light bg-opacity-25" style="border: 1px solid var(--theme-border) !important;">
+                        <div class="card-body">
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Email Address</small>
+                            <h5 class="fw-bold mt-2 text-dark mb-0">{{ request.user.email }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Created -->
+                <div class="col-lg-6">
+                    <div class="card border rounded-4 h-100 bg-light bg-opacity-25" style="border: 1px solid var(--theme-border) !important;">
+                        <div class="card-body">
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Account Created</small>
+                            <h5 class="fw-bold mt-2 text-dark mb-0">{{ request.user.date_joined|date:"d M Y, h:i A" }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Type -->
+                <div class="col-lg-6">
+                    <div class="card border rounded-4 h-100 bg-light bg-opacity-25" style="border: 1px solid var(--theme-border) !important;">
+                        <div class="card-body">
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Account Type</small>
+                            <h5 class="fw-bold mt-2 text-dark mb-0">User</h5>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===========================================
+        BOOKING DASHBOARD
+=========================================== -->
+
+<div class="container-fluid px-4">
+    
+    <!-- Count Grid -->
+    <div class="row g-4 mb-4">
+        
+        <!-- Total Bookings -->
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="card border-0 shadow rounded-4 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px; background: rgba(22, 163, 74, 0.08); color: var(--theme-green);">
+                        <i class="bi bi-car-front-fill fs-3"></i>
+                    </div>
+                    <h2 class="fw-extrabold text-dark mb-1" style="font-family: 'Poppins', sans-serif;">{{ total_bookings }}</h2>
+                    <p class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Total Bookings</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="card border-0 shadow rounded-4 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px; background: rgba(37, 99, 235, 0.08); color: #2563eb;">
+                        <i class="bi bi-check-circle-fill fs-3"></i>
+                    </div>
+                    <h2 class="fw-extrabold text-dark mb-1" style="font-family: 'Poppins', sans-serif;">{{ completed_bookings }}</h2>
+                    <p class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Completed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="card border-0 shadow rounded-4 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px; background: rgba(245, 158, 11, 0.08); color: #d97706;">
+                        <i class="bi bi-clock-history fs-3"></i>
+                    </div>
+                    <h2 class="fw-extrabold text-dark mb-1" style="font-family: 'Poppins', sans-serif;">{{ pending_bookings }}</h2>
+                    <p class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Pending</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancelled -->
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="card border-0 shadow rounded-4 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px; background: rgba(239, 68, 68, 0.08); color: #dc2626;">
+                        <i class="bi bi-x-circle-fill fs-3"></i>
+                    </div>
+                    <h2 class="fw-extrabold text-dark mb-1" style="font-family: 'Poppins', sans-serif;">{{ cancelled_bookings }}</h2>
+                    <p class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Cancelled</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card border-0 shadow-lg rounded-4 mb-4">
+        <div class="card-header py-3">
+            <h4>
+                <i class="bi bi-clock-history me-2 text-dark"></i> Recent Activity
+            </h4>
+        </div>
+        <div class="card-body p-0">
+            <div class="list-group list-group-flush">
+                
+                <div class="list-group-item border-0 d-flex align-items-center bg-transparent">
+                    <div class="stat-circle-box me-3" style="background: rgba(22, 163, 74, 0.08); color: var(--theme-green); width: 44px; height: 44px; font-size: 18px;">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                    <div>
+                        <strong class="text-dark">Account Created</strong>
+                        <div class="text-muted small mt-1">
+                            Joined TaxiGo on {{ request.user.date_joined|date:"d M Y" }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-group-item border-0 d-flex align-items-center bg-transparent">
+                    <div class="stat-circle-box me-3" style="background: rgba(59, 130, 246, 0.08); color: #2563eb; width: 44px; height: 44px; font-size: 18px;">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+                    <div>
+                        <strong class="text-dark">Profile Updated</strong>
+                        <div class="text-muted small mt-1">
+                            Keep your personal information up to date.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card border-0 shadow-lg rounded-4 mb-5">
+        <div class="card-header py-3">
+            <h4>
+                <i class="bi bi-lightning-charge-fill me-2 text-success"></i> Quick Actions
+            </h4>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                
+                <div class="col-lg-3 col-md-6 col-12">
+                    <a href="{% url 'available_cars' %}" class="btn btn-success w-100 py-3 rounded-3 d-flex flex-column align-items-center gap-1">
+                        <i class="bi bi-car-front-fill fs-3 mb-1"></i>
+                        <span>Book Cab</span>
+                    </a>
+                </div>
+
+                <div class="col-lg-3 col-md-6 col-12">
+                    <a href="{% url 'active_ride' %}" class="btn btn-primary w-100 py-3 rounded-3 d-flex flex-column align-items-center gap-1">
+                        <i class="bi bi-geo-alt-fill fs-3 mb-1"></i>
+                        <span>Active Ride</span>
+                    </a>
+                </div>
+
+                <div class="col-lg-3 col-md-6 col-12">
+                    <a href="{% url 'user_ride_history' %}" class="btn btn-dark w-100 py-3 rounded-3 d-flex flex-column align-items-center gap-1" style="background-color: var(--theme-black); border-color: var(--theme-black);">
+                        <i class="bi bi-clock-history fs-3 mb-1"></i>
+                        <span>Ride History</span>
+                    </a>
+                </div>
+
+                <div class="col-lg-3 col-md-6 col-12">
+                    <a href="{% url 'user_edit_profile' %}" class="btn btn-outline-success w-100 py-3 rounded-3 d-flex flex-column align-items-center gap-1">
+                        <i class="bi bi-pencil-square fs-3 mb-1"></i>
+                        <span>Edit Profile</span>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

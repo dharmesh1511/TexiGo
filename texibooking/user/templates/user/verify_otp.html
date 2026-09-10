@@ -1,0 +1,301 @@
+
+{% extends 'user/base.html' %}
+
+{% block title %}
+Verify OTP - TaxiGo
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .otp-page {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 20px;
+    }
+
+    .otp-card {
+        width: 100%;
+        max-width: 470px;
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 42px 38px;
+        box-shadow: 0 20px 60px rgba(17, 24, 39, 0.12);
+        border: 1px solid rgba(17, 24, 39, 0.06);
+    }
+
+    .otp-icon {
+        width: 78px;
+        height: 78px;
+        margin: 0 auto 22px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(22, 163, 74, 0.10);
+        color: #16A34A;
+        font-size: 36px;
+    }
+
+    .otp-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+
+    .otp-subtitle {
+        color: #6B7280;
+        font-size: 14px;
+        line-height: 1.6;
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .otp-alert {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #F0FDF4;
+        color: #166534;
+        font-size: 13px;
+        margin-bottom: 24px;
+    }
+
+    .otp-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+
+    .otp-input-wrapper {
+        position: relative;
+    }
+
+    .otp-input-wrapper i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9CA3AF;
+        font-size: 19px;
+        z-index: 2;
+    }
+
+    .otp-input {
+        width: 100%;
+        height: 58px;
+        border: 1px solid #E5E7EB;
+        border-radius: 14px;
+        padding: 0 18px 0 48px;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: 8px;
+        color: #111827;
+        background: #F9FAFB;
+        outline: none;
+        transition: all 0.25s ease;
+    }
+
+    .otp-input::placeholder {
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: 0;
+        color: #9CA3AF;
+    }
+
+    .otp-input:focus {
+        background: #ffffff;
+        border-color: #16A34A;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.10);
+    }
+
+    .verify-btn {
+        width: 100%;
+        padding: 9px 18px;
+        font-size: 14px;
+        min-height: 40px;
+        border: none;
+        border-radius: 8px;
+        background: #16A34A;
+        color: #ffffff;
+        font-weight: 600;
+        margin-top: 22px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .verify-btn:hover {
+        background: #15803D;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(22, 163, 74, 0.22);
+    }
+
+    .otp-security {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 7px;
+        margin-top: 20px;
+        color: #6B7280;
+        font-size: 12px;
+    }
+
+    .otp-security i {
+        color: #16A34A;
+    }
+
+    .otp-help {
+        text-align: center;
+        margin-top: 24px;
+        padding-top: 22px;
+        border-top: 1px solid #F3F4F6;
+    }
+
+    .otp-help p {
+        margin: 0;
+        color: #6B7280;
+        font-size: 13px;
+    }
+
+    .otp-help a {
+        color: #16A34A;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .otp-help a:hover {
+        text-decoration: underline;
+    }
+
+    /* Mobile */
+    @media (max-width: 576px) {
+        .otp-page {
+            padding: 30px 15px;
+        }
+
+        .otp-card {
+            padding: 32px 22px;
+            border-radius: 20px;
+        }
+
+        .otp-title {
+            font-size: 24px;
+        }
+
+        .otp-icon {
+            width: 68px;
+            height: 68px;
+            font-size: 30px;
+        }
+
+        .otp-input {
+            height: 54px;
+            font-size: 20px;
+            letter-spacing: 6px;
+        }
+    }
+</style>
+
+
+<div class="otp-page">
+
+    <div class="otp-card">
+
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="otp-alert">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+
+        <!-- Icon -->
+        <div class="otp-icon">
+            <i class="bi bi-shield-lock-fill"></i>
+        </div>
+
+
+        <!-- Heading -->
+        <h1 class="otp-title">
+            Verify Your Email
+        </h1>
+
+        <p class="otp-subtitle">
+            We've sent a 6-digit verification code to your
+            registered email address. Enter the code below to
+            complete your registration.
+        </p>
+
+
+        <!-- OTP Form -->
+        <form method="POST">
+            {% csrf_token %}
+
+            <label class="otp-label">
+                Verification Code
+            </label>
+
+            <div class="otp-input-wrapper">
+
+                <i class="bi bi-key-fill"></i>
+
+                <input
+                    type="text"
+                    name="otp"
+                    class="otp-input"
+                    maxlength="6"
+                    minlength="6"
+                    pattern="[0-9]{6}"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    placeholder="Enter 6-digit OTP"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Verify Button -->
+            <button type="submit" class="verify-btn">
+                <i class="bi bi-shield-check me-2"></i>
+                Verify & Continue
+            </button>
+
+        </form>
+
+
+        <!-- Security -->
+        <div class="otp-security">
+            <i class="bi bi-lock-fill"></i>
+            <span>Your verification code is secure</span>
+        </div>
+
+
+        <!-- Help -->
+        <div class="otp-help">
+            <p>
+                Didn't receive the code?
+                <br>
+                Check your spam or junk folder.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,392 @@
+{% extends 'adminpanel/base.html' %}
+
+{% block title %}Vehicle{% endblock %}
+
+{% block content %}
+<!-- Google Fonts & Custom Premium CSS -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Premium Styling Scoped for Vehicle Form */
+    .vehicle-form-section {
+        font-family: 'Poppins', sans-serif;
+        color: #111827;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.4s ease-out forwards;
+    }
+
+    /* Custom Form Card */
+    .form-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #16A34A;
+    }
+
+    .form-card-header {
+        background: #ffffff;
+        padding: 24px 30px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .form-card-body {
+        padding: 30px;
+    }
+
+    /* Label Styling */
+    .form-label-custom {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #4b5563;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* Input Styling - Targeting Django form widgets dynamically */
+    .form-card-body input,
+    .form-card-body textarea,
+    .form-card-body select {
+        display: block;
+        width: 100%;
+        height: 46px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background-color: #ffffff;
+        font-size: 0.925rem;
+        color: #111827;
+        padding: 10px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .form-card-body textarea {
+        height: auto !important;
+        resize: vertical;
+        padding: 14px 16px;
+    }
+
+    .form-card-body input:focus,
+    .form-card-body textarea:focus,
+    .form-card-body select:focus {
+        border-color: #16A34A !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+        background-color: #ffffff;
+        outline: none;
+    }
+
+    /* File Input Styling overrides */
+    .form-card-body input[type="file"] {
+        padding: 8px 12px;
+        height: auto;
+    }
+
+    /* Buttons */
+    .btn-custom-cancel {
+        background-color: #f3f4f6;
+        color: #4b5563 !important;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 8px 16px;
+        font-size: 14px;
+        min-height: 38px;
+        border: none;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-custom-cancel:hover {
+        background-color: #e5e7eb;
+        color: #1f2937 !important;
+        transform: translateX(-2px);
+    }
+
+    .btn-custom-submit {
+        background-color: #16A34A;
+        color: #ffffff !important;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 8px 16px;
+        font-size: 14px;
+        min-height: 38px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-custom-submit:hover {
+        background-color: #15803D;
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-custom-submit:active {
+        transform: translateY(1px);
+    }
+
+    /* Custom visual helpers */
+    .helper-card {
+        background-color: #f9fafb;
+        border: 1px dashed #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        height: 100%;
+    }
+
+    .checklist-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .checklist-icon {
+        color: #16A34A;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+    }
+</style>
+
+<div class="vehicle-form-section container-fluid py-4 fade-in-up">
+
+    <!-- Header Breadcrumbs -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1" style="letter-spacing: -0.5px; color: #111827;">
+            {% if form.instance.pk %}
+                ✏ Edit Vehicle details
+            {% else %}
+                🚗 Register New Vehicle
+            {% endif %}
+        </h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}" class="text-decoration-none text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'vehicle_list' %}" class="text-decoration-none text-muted">Vehicles</a></li>
+                <li class="breadcrumb-item active text-success fw-semibold" aria-current="page">
+                    {% if form.instance.pk %}
+                        Edit details
+                    {% else %}
+                        Register Vehicle
+                    {% endif %}
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-xl-10">
+
+            <div class="row g-4">
+
+                <!-- Left Helper Panel -->
+                <div class="col-12 col-lg-4">
+                    <div class="helper-card">
+                        {% if form.instance.pk %}
+                            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-info-circle-fill text-success me-1"></i> Current Registry</h5>
+                            <p class="text-muted small mb-4">You are editing vehicle details. View the current image attached to this vehicle registry below.</p>
+                            
+                            {% if form.instance.car_image %}
+                                <div class="text-center bg-white p-3 rounded-3 border mb-3">
+                                    <img src="{{ form.instance.car_image.url }}"
+                                         class="img-fluid rounded-3"
+                                         style="max-height: 180px; object-fit: cover;"
+                                         alt="Current Car Image">
+                                </div>
+                                <span class="d-block text-center text-muted small fw-semibold">License: {{ form.instance.vehicle_number }}</span>
+                            {% else %}
+                                <div class="text-center bg-white p-4 rounded-3 border mb-3 text-muted">
+                                    <i class="bi bi-car-front fs-1"></i>
+                                    <p class="small mb-0 mt-2">No vehicle preview image uploaded yet.</p>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-shield-check text-success me-1"></i> Fleet Checklist</h5>
+                            <p class="text-muted small mb-4">Complete the fields on the right to register a new vehicle. Ensure the following criteria are met:</p>
+                            
+                            <div class="checklist-item">
+                                <i class="bi bi-check-circle-fill checklist-icon"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark small">Assign a Driver</h6>
+                                    <p class="text-muted small mb-0">Select an onboarded driver from the list.</p>
+                                </div>
+                            </div>
+
+                            <div class="checklist-item">
+                                <i class="bi bi-check-circle-fill checklist-icon"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark small">Registration Details</h6>
+                                    <p class="text-muted small mb-0">Ensure registration & insurance values match records.</p>
+                                </div>
+                            </div>
+
+                            <div class="checklist-item">
+                                <i class="bi bi-check-circle-fill checklist-icon"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark small">Vehicle Image</h6>
+                                    <p class="text-muted small mb-0">Upload a clear side/front preview image (Max 5MB).</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Right Form Panel -->
+                <div class="col-12 col-lg-8">
+                    <div class="form-card">
+
+                        <div class="form-card-header">
+                            <h4 class="fw-bold mb-0 text-dark">Vehicle Information</h4>
+                            <p class="text-muted small mb-0">Fill in manufacture, seating capacities, vehicle numbers, and validation details.</p>
+                        </div>
+
+                        <div class="form-card-body">
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <div class="row g-3">
+
+                                    <!-- Driver -->
+                                    <div class="col-md-12 mb-2">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-person-badge me-1"></i> Assigned Driver
+                                        </label>
+                                        <select name="driver" class="form-control">
+                                            {% for driver in drivers %}
+                                                <option value="{{ driver.id }}"
+                                                {% if form.instance.driver and form.instance.driver.id == driver.id %}
+                                                    selected
+                                                {% endif %}>
+                                                    {{ driver.full_name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <!-- Company Name & Car Model -->
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-building me-1"></i> Company Name
+                                        </label>
+                                        {{ form.company_name }}
+                                    </div>
+
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-car-front me-1"></i> Car Model
+                                        </label>
+                                        {{ form.car_model }}
+                                    </div>
+
+                                    <!-- Vehicle Number & Color -->
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-hash me-1"></i> Vehicle Number
+                                        </label>
+                                        {{ form.vehicle_number }}
+                                    </div>
+
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-palette me-1"></i> Vehicle Color
+                                        </label>
+                                        {{ form.vehicle_color }}
+                                    </div>
+
+                                    <!-- Seating Capacity & Registration -->
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-people me-1"></i> Seating Capacity
+                                        </label>
+                                        {{ form.seating_capacity }}
+                                    </div>
+
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-file-earmark-medical me-1"></i> Registration Number
+                                        </label>
+                                        {{ form.registration_number }}
+                                    </div>
+
+                                    <!-- Insurance Number -->
+                                    <div class="col-md-12 mb-2">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-shield-check me-1"></i> Insurance Number
+                                        </label>
+                                        {{ form.insurance_number }}
+                                    </div>
+
+                                    <!-- Car Image -->
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-image me-1"></i> Upload Vehicle Preview
+                                        </label>
+                                        {{ form.car_image }}
+                                        
+                                        {% if form.instance.car_image %}
+                                            <div class="mt-3">
+                                                <small class="text-muted d-block mb-2">Current upload preview:</small>
+                                                <img src="{{ form.instance.car_image.url }}"
+                                                     width="180"
+                                                     class="img-thumbnail rounded-3"
+                                                     alt="Attached Car Image">
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="d-flex justify-content-between align-items-center border-top pt-4 mt-3">
+                                    <a href="{% url 'vehicle_list' %}" class="btn-custom-cancel text-decoration-none">
+                                        <i class="bi bi-arrow-left"></i> Back
+                                    </a>
+
+                                    <button type="submit" class="btn-custom-submit">
+                                        <i class="bi-save me-1"></i> Save Vehicle
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

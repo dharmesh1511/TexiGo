@@ -1,0 +1,453 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block title %}Available Cars - TaxiGo{% endblock %}
+
+{% block content %}
+<style>
+    /*====================== AVAILABLE FLEET SYSTEM ======================*/
+    :root {
+        --theme-green: #2563EB;
+        --theme-green-hover: #1D4ED8;
+        --theme-black: #0F172A;
+        --theme-dark-gray: #0F172A;
+        --theme-light-gray: #F8FAFC;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+        --theme-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Hero Section */
+    .cars-hero {
+        background:
+            radial-gradient(500px circle at 90% -20%, rgba(22, 163, 74, .15) 0%, rgba(0, 0, 0, 0) 60%),
+            linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        color: #fff;
+        padding: 70px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cars-hero .eyebrow {
+        color: var(--theme-green);
+        font-weight: 700;
+        letter-spacing: 2px;
+        font-size: 12px;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .cars-hero h1 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 42px;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        color: #fff;
+        margin-bottom: 8px;
+    }
+
+    .cars-hero p {
+        color: #94A3B8;
+        font-size: 16px;
+        margin: 0;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Car Catalog Card */
+    .car-card {
+        border: 1px solid var(--theme-border) !important;
+        border-radius: 18px !important;
+        overflow: hidden;
+        background: #ffffff;
+        box-shadow: var(--theme-shadow) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .car-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--theme-shadow-lg) !important;
+    }
+
+    .car-image-container {
+        position: relative;
+        overflow: hidden;
+        height: 200px;
+        background-color: #ffffff;
+        border-bottom: 1px solid var(--theme-border);
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .car-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform .5s ease;
+    }
+
+    .car-card:hover .car-image {
+        transform: scale(1.05);
+    }
+
+    .rating-chip {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        background: rgba(17, 24, 39, 0.85);
+        color: #fff;
+        backdrop-filter: blur(4px);
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .rating-chip i {
+        color: #F59E0B;
+    }
+
+    .price-tag {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--theme-green);
+        background: rgba(22, 163, 74, 0.08);
+        border: 1px solid rgba(22, 163, 74, 0.15);
+        padding: 6px 14px;
+        border-radius: 30px;
+        display: inline-block;
+    }
+
+    .driver-badge-box {
+        background: var(--theme-light-gray);
+        border: 1px solid var(--theme-border);
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    /* Buttons */
+    .btn-book-now {
+        background-color: var(--theme-green);
+        border-color: var(--theme-green);
+        color: #ffffff !important;
+        font-weight: 700;
+        padding: 9px 18px;
+        font-size: 14px;
+        min-height: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+        transition: all 0.2s ease;
+    }
+
+    .btn-book-now:hover {
+        background-color: var(--theme-green-hover);
+        border-color: var(--theme-green-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.25);
+    }
+</style>
+
+<!-- Hero -->
+<section class="cars-hero text-center">
+    <div class="container">
+        <span class="eyebrow">Our Fleet</span>
+        <h1>Available Cars</h1>
+        <p>Choose from our selection of premium cabs for a comfortable journey</p>
+    </div>
+</section>
+
+<!-- Fleet List -->
+<div class="container my-5">
+    <div class="row g-4">
+
+        {% for vehicle in vehicles %}
+
+        <div class="col-lg-4 col-md-6">
+            <div class="car-card">
+
+                <!-- Image Wrapper -->
+                <div class="car-image-container">
+
+                    {% if vehicle.car_image %}
+
+                    <img src="{{ vehicle.car_image.url }}"
+                         class="car-image"
+                         alt="{{ vehicle.company_name }}">
+
+                    {% else %}
+
+                    <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100 rounded-top p-3"
+                         style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);">
+
+                        <svg width="80"
+                             height="50"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="#16A34A"
+                             stroke-width="1.5"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             class="mb-1">
+
+                            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"/>
+
+                            <circle cx="7" cy="17" r="2"/>
+
+                            <path d="M9 17h6"/>
+
+                            <circle cx="17" cy="17" r="2"/>
+
+                        </svg>
+
+                        <span class="fw-semibold text-muted small">
+                            TaxiGo Vehicle
+                        </span>
+
+                    </div>
+
+                    {% endif %}
+
+                    <span class="rating-chip">
+                        <i class="bi bi-star-fill"></i>
+                        4.9
+                    </span>
+
+                </div>
+
+
+                <!-- Info Block -->
+                <div class="p-4 d-flex flex-column flex-grow-1">
+
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+
+                        <div>
+
+                            <h4 class="fw-bold mb-1 text-dark"
+                                style="font-family: 'Poppins', sans-serif; font-size: 20px;">
+
+                                {{ vehicle.company_name }}
+
+                            </h4>
+
+                            <h6 class="text-muted mb-0"
+                                style="font-size: 14px;">
+
+                                {{ vehicle.car_model }}
+
+                            </h6>
+
+                        </div>
+
+                        <span class="price-tag">
+                            ₹{{ vehicle.price_per_km }}/KM
+                        </span>
+
+                    </div>
+
+
+                    <hr class="my-3"
+                        style="border-color: var(--theme-border);">
+
+
+                    <!-- Specs Details -->
+                    <div class="mb-4">
+
+                        <div class="d-flex justify-content-between mb-2">
+
+                            <span class="text-muted small">
+                                Vehicle No:
+                            </span>
+
+                            <span class="fw-semibold text-dark small">
+                                {{ vehicle.vehicle_number }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="d-flex justify-content-between mb-2">
+
+                            <span class="text-muted small">
+                                Color:
+                            </span>
+
+                            <span class="fw-semibold text-dark small">
+                                {{ vehicle.vehicle_color }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="d-flex justify-content-between">
+
+                            <span class="text-muted small">
+                                Seating Capacity:
+                            </span>
+
+                            <span class="fw-semibold text-dark small">
+                                {{ vehicle.seating_capacity }} Seats
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Driver Card Inside -->
+                    <div class="driver-badge-box mb-4">
+
+                        <h6 class="fw-bold text-dark mb-3"
+                            style="font-size: 13px;">
+
+                            <i class="bi bi-shield-check text-success me-1"></i>
+                            Driver Details
+
+                        </h6>
+
+
+                        <!-- Driver Name -->
+                        <div class="d-flex align-items-center mb-2">
+
+                            <i class="bi bi-person-fill text-muted me-2"
+                               style="font-size:16px;"></i>
+
+                            <div>
+
+                                <small class="text-muted d-block"
+                                       style="font-size:9px; text-transform: uppercase;">
+
+                                    Name
+
+                                </small>
+
+                                <span class="fw-semibold text-dark"
+                                      style="font-size: 13px;">
+
+                                    {% if vehicle.driver %}
+
+                                        {{ vehicle.driver.full_name }}
+
+                                    {% else %}
+
+                                        Not Assigned
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Driver Mobile -->
+                        <div class="d-flex align-items-center">
+
+                            <i class="bi bi-telephone-fill text-muted me-2"
+                               style="font-size:14px;"></i>
+
+                            <div>
+
+                                <small class="text-muted d-block"
+                                       style="font-size:9px; text-transform: uppercase;">
+
+                                    Mobile
+
+                                </small>
+
+                                <span class="fw-semibold"
+                                      style="font-size: 13px;">
+
+                                    {% if vehicle.driver %}
+
+                                        <a href="tel:{{ vehicle.driver.mobile }}"
+                                           class="text-decoration-none text-success">
+
+                                            {{ vehicle.driver.mobile }}
+
+                                        </a>
+
+                                    {% else %}
+
+                                        --
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Book Action -->
+                    <a href="{% url 'ride_detail' vehicle.id %}"
+                       class="btn btn-book-now w-100 mt-auto">
+
+                        Book Now
+
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        {% empty %}
+
+        <!-- No Vehicles -->
+        <div class="col-12">
+
+            <div class="card border-0 shadow text-center p-5 rounded-4">
+
+                <div class="card-body">
+
+                    <div class="empty-icon-box mb-3 d-inline-flex align-items-center justify-content-center"
+                         style="
+                            width: 70px;
+                            height: 70px;
+                            border-radius: 50%;
+                            background-color: rgba(22, 163, 74, 0.08);
+                            color: var(--theme-green);
+                            font-size: 32px;
+                         ">
+
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+
+                    </div>
+
+
+                    <h5 class="fw-bold text-dark mt-2">
+                        No Vehicles Available
+                    </h5>
+
+
+                    <p class="text-muted mb-0">
+                        Please check back later or contact customer support.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endblock %}

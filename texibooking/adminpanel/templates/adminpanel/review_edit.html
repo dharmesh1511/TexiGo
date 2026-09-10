@@ -1,0 +1,53 @@
+{% extends "adminpanel/base.html" %}
+
+{% block title %}
+Edit Review
+{% endblock %}
+
+{% block page %}
+Edit Review
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            <h4>Edit Review</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label">Rating</label>
+                    {{ form.rating }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Comment</label>
+                    {{ form.comment }}
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Update Review
+                </button>
+
+                <a href="{% url 'review_list' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

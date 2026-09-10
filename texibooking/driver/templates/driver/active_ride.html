@@ -1,0 +1,399 @@
+{% extends "driver/base.html" %}
+
+{% block title %}
+Driver Active Ride - TaxiGo
+{% endblock %}
+
+{% block page %}
+Active Ride Tracker
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --theme-green: #2563EB;
+        --theme-green-hover: #1D4ED8;
+        --theme-black: #0F172A;
+        --theme-light-gray: #F8FAFC;
+        --theme-border: #E2E8F0;
+    }
+
+    .active-ride-card {
+        background: #ffffff;
+        border: 1px solid var(--theme-border);
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .active-banner {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        color: #ffffff;
+        padding: 24px 30px;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .pulse-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #22C55E;
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+        animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .route-box {
+        background-color: var(--theme-light-gray);
+        border-radius: 14px;
+        padding: 20px;
+        border: 1px solid var(--theme-border);
+    }
+
+    .route-marker-start {
+        width: 10px;
+        height: 10px;
+        background-color: #2563EB;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .route-marker-end {
+        width: 10px;
+        height: 10px;
+        background-color: #EF4444;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    #driverMap {
+        width: 100%;
+        height: 400px;
+        border-radius: 16px;
+        border: 1px solid var(--theme-border);
+    }
+
+    .empty-state {
+        padding: 80px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: rgba(37, 99, 235, 0.08);
+        color: var(--theme-green);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 38px;
+        margin-bottom: 20px;
+    }
+
+    /* Responsive Media Queries */
+    @media (max-width: 991.98px) {
+        #driverMap {
+            height: 320px;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .active-banner {
+            padding: 16px 20px;
+        }
+        #driverMap {
+            height: 280px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .status-pill {
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+        .empty-state {
+            padding: 40px 15px;
+        }
+    }
+</style>
+
+<div class="container-fluid py-3">
+
+    {% if booking %}
+    <div class="row g-4">
+        <!-- Ride Control Left Column -->
+        <div class="col-lg-7">
+            <div class="active-ride-card mb-4">
+                <div class="active-banner d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <span class="text-white-50 small text-uppercase d-block" style="letter-spacing: 0.5px;">Active Ride Booking ID</span>
+                        <h4 class="fw-bold mb-0 text-white">#TB-{{ booking.id|stringformat:"05d" }}</h4>
+                    </div>
+                    <div>
+                        {% if booking.status == "Confirmed" %}
+                        <span class="status-pill bg-info text-white">
+                            <span class="pulse-dot bg-white"></span> Driver Assigned (En Route)
+                        </span>
+                        {% elif booking.status == "Arrived" %}
+                        <span class="status-pill bg-primary text-white">
+                            <span class="pulse-dot bg-white"></span> Arrived at Pickup
+                        </span>
+                        {% elif booking.status == "Started" %}
+                        <span class="status-pill bg-success text-white">
+                            <span class="pulse-dot bg-white"></span> Ride In Progress
+                        </span>
+                        {% elif booking.status == "Completed" %}
+                        <span class="status-pill bg-success text-white">
+                            <i class="bi bi-check-circle-fill me-1"></i> Ride Completed
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <!-- Customer Details -->
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4 mb-4 border">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fw-bold" style="width: 48px; height: 48px; font-size: 20px;">
+                                {{ booking.user.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <small class="text-muted d-block" style="font-size: 11px; text-transform: uppercase;">Customer Name</small>
+                                <strong class="text-dark fs-5">{{ booking.user.username }}</strong>
+                                <small class="text-muted d-block">{{ booking.user.email }}</small>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge bg-success px-3 py-2 fs-6">
+                                ₹{% if booking.final_fare %}{{ booking.final_fare }}{% else %}{{ booking.total_fare }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Route Information -->
+                    <div class="route-box mb-4">
+                        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-geo-alt-fill text-success me-2"></i> Route Details</h6>
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <span class="route-marker-start mt-1"></span>
+                                <div>
+                                    <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase;">Pickup Location</small>
+                                    <strong class="text-dark">{{ booking.pickup_location }}</strong>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-3">
+                                <span class="route-marker-end mt-1"></span>
+                                <div>
+                                    <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase;">Drop Location</small>
+                                    <strong class="text-dark">{{ booking.drop_location }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distance & Fare Info Grid -->
+                    <div class="row g-3 text-center mb-4">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <small class="text-muted d-block" style="font-size: 11px; text-transform: uppercase;">Distance</small>
+                                <strong class="fs-5 text-dark">{{ booking.distance }} KM</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <small class="text-muted d-block" style="font-size: 11px; text-transform: uppercase;">Total Fare</small>
+                                <strong class="fs-5 text-success">₹{% if booking.final_fare %}{{ booking.final_fare }}{% else %}{{ booking.total_fare }}{% endif %}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DRIVER ACTION PANEL -->
+                    <div class="card border rounded-4 p-4 bg-white shadow-sm">
+                        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-lightning-charge-fill me-2 text-warning"></i> Driver Actions</h6>
+
+                        {% if booking.status == "Confirmed" %}
+                        <a href="{% url 'driver_arrived' booking.id %}" class="btn btn-warning w-100 py-3 fw-bold fs-6">
+                            <i class="bi bi-geo-alt-fill me-2"></i> Mark Arrived at Pickup Location
+                        </a>
+
+                        {% elif booking.status == "Arrived" %}
+                        <div class="mb-3">
+                            <form action="{% url 'verify_ride_otp' booking.id %}" method="POST" class="d-flex gap-2 mb-2">
+                                {% csrf_token %}
+                                <input type="text" name="ride_otp" class="form-control form-control-lg text-center fw-bold" placeholder="Enter Customer OTP" maxlength="6" required>
+                                <button type="submit" class="btn btn-primary px-4 fw-bold">Verify OTP</button>
+                            </form>
+                            {% if booking.otp_verified %}
+                            <div class="alert alert-success py-2 mb-3 small fw-bold">
+                                ✓ OTP Verified! You can now start the ride.
+                            </div>
+                            <a href="{% url 'start_ride' booking.id %}" class="btn btn-success w-100 py-3 fw-bold fs-6">
+                                <i class="bi bi-play-circle-fill me-2"></i> Start Ride Now
+                            </a>
+                            {% else %}
+                            <small class="text-muted"><i class="bi bi-info-circle me-1"></i> Ask the customer for the 4-digit OTP to verify before starting.</small>
+                            {% endif %}
+                        </div>
+
+                        {% elif booking.status == "Started" %}
+                        <a href="{% url 'complete_booking' booking.id %}" class="btn btn-success w-100 py-3 fw-bold fs-6" onclick="return confirm('Complete this ride?');">
+                            <i class="bi bi-check-circle-fill me-2"></i> Complete Ride
+                        </a>
+
+                        {% elif booking.status == "Completed" %}
+                        {% if booking.payment and booking.payment.status == "Paid" %}
+                        <div class="alert alert-success fw-bold text-center mb-0">
+                            <i class="bi bi-check-circle-fill me-1"></i> Payment Received (Paid ✓ via {{ booking.payment.payment_method }})
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning text-center mb-3 fw-bold">
+                            <i class="bi bi-cash-stack me-1"></i> Payment Pending: Collect ₹{% if booking.final_fare %}{{ booking.final_fare }}{% else %}{{ booking.total_fare }}{% endif %} from customer
+                        </div>
+                        <a href="{% url 'confirm_cash_payment' booking.id %}" class="btn btn-dark w-100 py-3 fw-bold">
+                            <i class="bi bi-check-lg me-1"></i> Confirm Cash Collected
+                        </a>
+                        {% endif %}
+
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Route Map Right Column -->
+        <div class="col-lg-5">
+            <div class="active-ride-card p-3">
+                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-map-fill me-2 text-success"></i> Navigation Map</h6>
+                <div id="driverMap"></div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+
+    <!-- Empty State -->
+    <div class="active-ride-card">
+        <div class="card-body empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-taxi-front-fill"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-2">No Active Accepted Ride</h3>
+            <p class="text-muted mb-4" style="max-width: 450px; margin: 0 auto;">
+                You don't have any ongoing accepted ride right now. Accept ride requests from your dashboard or booking requests page to start tracking here.
+            </p>
+            <a href="{% url 'booking_requests' %}" class="btn btn-warning btn-lg">
+                <i class="bi bi-calendar-check me-2"></i> View Booking Requests
+            </a>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if booking %}
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const pickupLocStr = "{{ booking.pickup_location|escapejs }}";
+        const dropLocStr = "{{ booking.drop_location|escapejs }}";
+
+        let pickupLat = parseFloat("{{ booking.pickup_lat|default:'' }}");
+        let pickupLng = parseFloat("{{ booking.pickup_lng|default:'' }}");
+        let dropLat = parseFloat("{{ booking.drop_lat|default:'' }}");
+        let dropLng = parseFloat("{{ booking.drop_lng|default:'' }}");
+
+        const map = L.map('driverMap').setView([23.0225, 72.5714], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Fallback geocoding if lat/lng missing from DB
+        async function geocode(address) {
+            if (!address) return null;
+            try {
+                const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`);
+                const data = await resp.json();
+                if (data && data.length > 0) {
+                    return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+                }
+            } catch (err) {
+                console.error("Driver Map Geocode error:", err);
+            }
+            return null;
+        }
+
+        if (isNaN(pickupLat) || isNaN(pickupLng)) {
+            const coords = await geocode(pickupLocStr);
+            if (coords) {
+                pickupLat = coords[0];
+                pickupLng = coords[1];
+            }
+        }
+
+        if (isNaN(dropLat) || isNaN(dropLng)) {
+            const coords = await geocode(dropLocStr);
+            if (coords) {
+                dropLat = coords[0];
+                dropLng = coords[1];
+            }
+        }
+
+        // Custom Green Pickup Pin Icon
+        const pickupIcon = L.divIcon({
+            className: 'custom-pin-pickup',
+            html: `<div style="background-color:#2563EB; color:#ffffff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.3); font-size:16px;"><i class="bi bi-geo-alt-fill"></i></div>`,
+            iconSize: [34, 34],
+            iconAnchor: [17, 34]
+        });
+
+        // Custom Red Drop Pin Icon
+        const dropIcon = L.divIcon({
+            className: 'custom-pin-drop',
+            html: `<div style="background-color:#EF4444; color:#ffffff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.3); font-size:16px;"><i class="bi bi-pin-map-fill"></i></div>`,
+            iconSize: [34, 34],
+            iconAnchor: [17, 34]
+        });
+
+        let bounds = [];
+
+        if (!isNaN(pickupLat) && !isNaN(pickupLng)) {
+            const pickupMarker = L.marker([pickupLat, pickupLng], { icon: pickupIcon }).addTo(map)
+                .bindPopup(`<b>🟢 Pickup Location:</b><br>${pickupLocStr}`);
+            bounds.push([pickupLat, pickupLng]);
+        }
+
+        if (!isNaN(dropLat) && !isNaN(dropLng)) {
+            const dropMarker = L.marker([dropLat, dropLng], { icon: dropIcon }).addTo(map)
+                .bindPopup(`<b>🔴 Drop Location:</b><br>${dropLocStr}`);
+            bounds.push([dropLat, dropLng]);
+        }
+
+        if (bounds.length === 2) {
+            const polyline = L.polyline(bounds, { color: '#2563EB', weight: 5, opacity: 0.85, dashArray: '6, 8' }).addTo(map);
+            map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+        } else if (bounds.length === 1) {
+            map.setView(bounds[0], 14);
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

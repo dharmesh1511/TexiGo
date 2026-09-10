@@ -1,0 +1,181 @@
+{% extends 'driver/base.html' %}
+
+{% block title %}
+Verify Driver Account - TaxiGo
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .otp-wrapper {
+        min-height: 75vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+
+    .otp-card {
+        width: 100%;
+        max-width: 460px;
+        background: #fff;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(17, 24, 39, 0.12);
+        border: 1px solid #f1f1f1;
+    }
+
+    .otp-icon {
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 20px;
+        border-radius: 20px;
+        background: rgba(22, 163, 74, 0.10);
+        color: #16A34A;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 34px;
+    }
+
+    .otp-title {
+        text-align: center;
+        color: #111827;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .otp-text {
+        text-align: center;
+        color: #6B7280;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 28px;
+    }
+
+    .otp-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+
+    .otp-input {
+        width: 100%;
+        height: 58px;
+        border: 1px solid #E5E7EB;
+        border-radius: 14px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 10px;
+        outline: none;
+        background: #F9FAFB;
+        transition: .25s;
+    }
+
+    .otp-input:focus {
+        background: #fff;
+        border-color: #16A34A;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, .10);
+    }
+
+    .verify-btn {
+        width: 100%;
+        height: 54px;
+        border: none;
+        border-radius: 14px;
+        background: #16A34A;
+        color: #fff;
+        font-weight: 600;
+        margin-top: 22px;
+        transition: .25s;
+    }
+
+    .verify-btn:hover {
+        background: #15803D;
+        transform: translateY(-1px);
+    }
+
+    .otp-security {
+        text-align: center;
+        margin-top: 20px;
+        color: #6B7280;
+        font-size: 12px;
+    }
+
+    .otp-security i {
+        color: #16A34A;
+    }
+
+    @media (max-width: 576px) {
+        .otp-card {
+            padding: 30px 22px;
+        }
+    }
+</style>
+
+
+<div class="otp-wrapper">
+
+    <div class="otp-card">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="otp-icon">
+            <i class="bi bi-shield-lock-fill"></i>
+        </div>
+
+        <h3 class="otp-title">
+            Verify Driver Account
+        </h3>
+
+        <p class="otp-text">
+            We've sent a 6-digit verification code to your
+            registered email address.
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label class="otp-label">
+                Enter Verification Code
+            </label>
+
+            <input
+                type="text"
+                name="otp"
+                class="otp-input"
+                maxlength="6"
+                minlength="6"
+                pattern="[0-9]{6}"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                placeholder="000000"
+                required
+            >
+
+            <button type="submit" class="verify-btn">
+                <i class="bi bi-check-circle me-2"></i>
+                Verify & Continue
+            </button>
+
+        </form>
+
+        <div class="otp-security">
+            <i class="bi bi-lock-fill me-1"></i>
+            Your verification code is secure
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,621 @@
+{% extends 'user/base.html' %}
+
+{% block title %}
+My Bookings
+{% endblock %}
+
+{% block content %}
+<style>
+    /*====================== TRANSITIONS & PALETTE ======================*/
+    :root {
+        --theme-green: #2563EB;
+        --theme-green-hover: #1D4ED8;
+        --theme-black: #0F172A;
+        --theme-dark-gray: #0F172A;
+        --theme-light-gray: #F8FAFC;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+        --theme-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    body {
+        background-color: var(--theme-light-gray);
+    }
+
+    .page-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--theme-black);
+        letter-spacing: -1px;
+    }
+
+    /* Stat Cards */
+    .stat-card {
+        border: 1px solid var(--theme-border) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--theme-shadow-lg);
+    }
+
+    .booking-card {
+        border: 1px solid var(--theme-border);
+        border-radius: 18px;
+        box-shadow: var(--theme-shadow-lg);
+        background-color: #ffffff;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .booking-card-header {
+        background-color: #ffffff;
+        border-bottom: 1px solid var(--theme-border);
+        padding: 24px 30px;
+    }
+
+    /* Table Design */
+    .table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .table thead th {
+        background-color: var(--theme-light-gray);
+        color: #4b5563;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--theme-border);
+        border-top: none;
+    }
+
+    .table tbody td {
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--theme-border);
+        color: #374151;
+        font-size: 14px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(22, 163, 74, 0.01) !important;
+        transition: background-color 0.2s ease;
+    }
+
+    /* Thumbnails */
+    .vehicle-img {
+        width: 105px;
+        height: 68px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid var(--theme-border);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Badges */
+    .badge {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.1px;
+    }
+
+    .badge.bg-warning {
+        background-color: rgba(245, 158, 11, 0.08) !important;
+        color: #d97706 !important;
+        border: 1px solid rgba(245, 158, 11, 0.15) !important;
+    }
+
+    .badge.bg-info {
+        background-color: rgba(14, 165, 233, 0.08) !important;
+        color: #0284c7 !important;
+        border: 1px solid rgba(14, 165, 233, 0.15) !important;
+    }
+
+    .badge.bg-success {
+        background-color: rgba(22, 163, 74, 0.08) !important;
+        color: #16a34a !important;
+        border: 1px solid rgba(22, 163, 74, 0.15) !important;
+    }
+
+    .badge.bg-primary {
+        background-color: rgba(59, 130, 246, 0.08) !important;
+        color: #2563eb !important;
+        border: 1px solid rgba(59, 130, 246, 0.15) !important;
+    }
+
+    .badge.bg-danger {
+        background-color: rgba(239, 68, 68, 0.08) !important;
+        color: #dc2626 !important;
+        border: 1px solid rgba(239, 68, 68, 0.15) !important;
+    }
+
+    .badge.bg-secondary {
+        background-color: rgba(100, 116, 139, 0.08) !important;
+        color: #475569 !important;
+        border: 1px solid rgba(100, 116, 139, 0.15) !important;
+    }
+
+    /* Buttons */
+    .btn-action-pay {
+        font-weight: 600;
+        font-size: 12px;
+        padding: 6px 12px;
+        border-radius: 30px;
+        background-color: var(--theme-green);
+        border-color: var(--theme-green);
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+        transition: all 0.2s ease;
+    }
+
+    .btn-action-pay:hover {
+        background-color: var(--theme-green-hover);
+        border-color: var(--theme-green-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.25);
+    }
+
+    .btn-action-cancel {
+        font-weight: 600;
+        font-size: 12px;
+        padding: 6px 12px;
+        border-radius: 30px;
+        background-color: #ffffff;
+        border: 1.5px solid rgba(239, 68, 68, 0.2);
+        color: #dc2626 !important;
+        transition: all 0.2s ease;
+    }
+
+    .btn-action-cancel:hover {
+        background-color: #fef2f2;
+        border-color: #dc2626;
+        transform: translateY(-2px);
+    }
+
+    .empty-icon-box {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 38px;
+    }
+
+    /* Route Indicators */
+    .route-marker-start {
+        width: 8px;
+        height: 8px;
+        background-color: var(--theme-green);
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .route-marker-end {
+        width: 8px;
+        height: 8px;
+        background-color: #EF4444;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    /* Mobile Booking Cards styling */
+    .booking-mobile-card {
+        border: 1px solid var(--theme-border);
+        border-radius: 16px;
+        background-color: #ffffff;
+        transition: all 0.2s ease;
+    }
+
+    .booking-mobile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--theme-shadow);
+    }
+</style>
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="page-title mb-1">My Bookings</h2>
+            <p class="text-muted mb-0">View and manage your cab bookings</p>
+        </div>
+        <a href="{% url 'available_cars' %}" class="btn btn-warning btn-lg">
+            + Book New Ride
+        </a>
+    </div>
+
+    <!-- Mini Dashboard Stats widgets -->
+    <div class="row g-4 mb-4">
+        <!-- Stat 1 -->
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card border-0 shadow-sm p-3 bg-white rounded-4 stat-card">
+                <div class="card-body d-flex align-items-center gap-3 py-2">
+                    <div class="stat-icon-box"
+                        style="width: 50px; height: 50px; border-radius: 12px; background: rgba(22, 163, 74, 0.08); color: var(--theme-green); display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                        <i class="bi bi-taxi-front-fill"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold"
+                            style="font-size: 11px; letter-spacing: 0.5px;">Total Bookings</small>
+                        <h4 class="fw-bold mb-0 text-dark">{{ bookings|length }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Stat 2 -->
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card border-0 shadow-sm p-3 bg-white rounded-4 stat-card">
+                <div class="card-body d-flex align-items-center gap-3 py-2">
+                    <div class="stat-icon-box"
+                        style="width: 50px; height: 50px; border-radius: 12px; background: rgba(14, 165, 233, 0.08); color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold"
+                            style="font-size: 11px; letter-spacing: 0.5px;">Account Status</small>
+                        <h4 class="fw-bold mb-0 text-dark">Verified</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Stat 3 -->
+        <div class="col-lg-4 col-md-12 col-12">
+            <div class="card border-0 shadow-sm p-3 bg-white rounded-4 stat-card">
+                <div class="card-body d-flex align-items-center gap-3 py-2">
+                    <div class="stat-icon-box"
+                        style="width: 50px; height: 50px; border-radius: 12px; background: rgba(245, 158, 11, 0.08); color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold"
+                            style="font-size: 11px; letter-spacing: 0.5px;">Rider Tier</small>
+                        <h4 class="fw-bold mb-0 text-dark">Premium Rider</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if bookings %}
+
+    <!-- DESKTOP TRIP LIST VIEW -->
+    <div class="card booking-card d-none d-lg-block">
+        <div class="booking-card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-dark">All Booked Rides</h5>
+            <span class="badge bg-secondary border text-dark">{{ bookings|length }} Trips</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Vehicle</th>
+                            <th>Route Journey</th>
+                            <th>Date & Time</th>
+                            <th>Distance</th>
+                            <th>Fare</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td class="fw-bold text-muted">
+                                {{ forloop.counter }}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center text-start">
+                                    {% if booking.vehicle.car_image %}
+                                    <img src="{{ booking.vehicle.car_image.url }}" class="vehicle-img me-3">
+                                    {% endif %}
+                                    <div>
+                                        <strong class="text-dark d-block">
+                                            {{ booking.vehicle.company_name }}
+                                        </strong>
+                                        <small class="text-muted">
+                                            {{ booking.vehicle.car_model }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-start" style="min-width: 200px; max-width: 300px;">
+                                <div class="d-flex flex-column gap-2 py-1">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="route-marker-start mt-1"></span>
+                                        <span class="text-dark fw-semibold" style="word-break: break-word;"
+                                            title="{{ booking.pickup_location }}">{{ booking.pickup_location }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="route-marker-end mt-1"></span>
+                                        <span class="text-muted" style="word-break: break-word;"
+                                            title="{{ booking.drop_location }}">{{ booking.drop_location }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark">{{ booking.booking_datetime|date:"d M Y" }}</span>
+                                <small class="text-muted d-block mt-1">{{ booking.booking_datetime|time:"h:i A" }}</small>
+                            </td>
+                            <td class="fw-bold text-dark">
+                                {{ booking.distance }} KM
+                            </td>
+                            <td>
+                                <span class="fw-bold text-success fs-5">
+                                    ₹{{ booking.total_fare }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if booking.status == "Pending" %}
+                                <span class="badge bg-warning text-dark">
+                                    Pending Driver
+                                </span>
+                                {% elif booking.status == "Confirmed" %}
+                                <span class="badge bg-info">
+                                    Driver Assigned
+                                </span>
+                                {% elif booking.status == "Arrived" %}
+                                <span class="badge bg-primary">
+                                    Driver Arrived
+                                </span>
+                                {% elif booking.status == "Started" %}
+                                <span class="badge bg-success">
+                                    Ride In Progress
+                                </span>
+                                {% elif booking.status == "Completed" %}
+                                {% if booking.payment and booking.payment.status == "Paid" %}
+                                <span class="badge bg-success">
+                                    Paid ✓
+                                </span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    Payment Pending
+                                </span>
+                                {% endif %}
+                                {% elif booking.status == "Rejected" %}
+                                <span class="badge bg-danger">
+                                    Driver Rejected
+                                </span>
+                                {% elif booking.status == "Cancelled" %}
+                                <span class="badge bg-secondary">
+                                    Ride Cancelled
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column justify-content-center align-items-center gap-1">
+                                    {% if booking.status == "Pending" or booking.status == "Confirmed" %}
+                                    <a href="{% url 'cancel_booking' booking.id %}"
+                                        class="btn btn-action-cancel d-inline-flex align-items-center">
+                                        Cancel Ride
+                                    </a>
+                                    {% elif booking.status == "Arrived" %}
+                                    <div class="px-3 py-1 bg-dark text-warning rounded-3 border fw-bold small">
+                                        Ride OTP: {{ booking.ride_otp }}
+                                    </div>
+                                    {% elif booking.status == "Started" %}
+                                    <span class="text-success fw-bold small">
+                                        <i class="bi bi-geo-alt-fill me-1"></i> On the Way
+                                    </span>
+                                    {% elif booking.status == "Completed" %}
+                                    {% if not booking.payment or booking.payment.status != "Paid" %}
+                                    {% if booking.payment and booking.payment.payment_method == "Cash" %}
+                                    <div class="d-flex flex-column align-items-center gap-1">
+                                        <span class="badge bg-warning text-dark px-2 py-1 border">
+                                            <i class="bi bi-cash-stack me-1"></i> Cash Selected (Pay Driver)
+                                        </span>
+                                        <a href="{% url 'payment' booking.id %}"
+                                            class="small text-muted text-decoration-none" style="font-size: 11px;">
+                                            <i class="bi bi-credit-card me-1"></i> Pay via Razorpay
+                                        </a>
+                                    </div>
+                                    {% else %}
+                                    <div class="d-flex gap-1 flex-wrap justify-content-center">
+                                        <a href="{% url 'payment' booking.id %}"
+                                            class="btn btn-sm btn-success fw-bold px-2 py-1 rounded-3">
+                                            <i class="bi bi-credit-card me-1"></i> Razorpay
+                                        </a>
+                                        <a href="{% url 'pay_cash' booking.id %}"
+                                            class="btn btn-sm btn-outline-dark fw-bold px-2 py-1 rounded-3">
+                                            <i class="bi bi-cash me-1"></i> Cash
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    {% else %}
+                                    <div class="d-flex gap-1 flex-wrap justify-content-center align-items-center">
+                                        <a href="{% url 'download_invoice' booking.id %}"
+                                            class="btn btn-sm btn-outline-primary fw-bold px-2 py-1 rounded-3">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i> Invoice
+                                        </a>
+                                        {% if booking.review %}
+                                        <span class="badge bg-success-subtle text-success border px-2 py-1">
+                                            ★ {{ booking.review.rating }}/5
+                                        </span>
+                                        {% else %}
+                                        <a href="{% url 'add_review' booking.id %}"
+                                            class="btn btn-sm btn-warning fw-bold px-2 py-1 rounded-3">
+                                            ⭐ Review
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    {% elif booking.status == "Rejected" %}
+                                    <span class="text-danger small fw-semibold">Rejected</span>
+                                    {% elif booking.status == "Cancelled" %}
+                                    <span class="text-muted small fw-semibold">Cancelled</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE & TABLET TRIP CARDS FEED -->
+    <div class="d-lg-none d-flex flex-column gap-3">
+        {% for booking in bookings %}
+        <div class="booking-mobile-card p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-bold text-muted" style="font-size: 13px;">Trip #{{ forloop.counter }}</span>
+                {% if booking.status == "Pending" %}
+                <span class="badge bg-warning text-dark">Pending</span>
+                {% elif booking.status == "Confirmed" %}
+                <span class="badge bg-info">Confirmed</span>
+                {% elif booking.status == "Arrived" %}
+                <span class="badge bg-primary">Arrived</span>
+                {% elif booking.status == "Started" %}
+                <span class="badge bg-success">Ride In Progress</span>
+                {% elif booking.status == "Completed" %}
+                {% if booking.payment and booking.payment.status == "Paid" %}
+                <span class="badge bg-success">Paid ✓</span>
+                {% else %}
+                <span class="badge bg-warning text-dark">Completed (Unpaid)</span>
+                {% endif %}
+                {% elif booking.status == "Rejected" %}
+                <span class="badge bg-danger">Rejected</span>
+                {% elif booking.status == "Cancelled" %}
+                <span class="badge bg-secondary">Cancelled</span>
+                {% endif %}
+            </div>
+
+            <!-- Vehicle Details -->
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                {% if booking.vehicle.car_image %}
+                <img src="{{ booking.vehicle.car_image.url }}"
+                    style="width: 105px; height: 68px; object-fit: cover; border-radius: 10px; border: 1px solid var(--theme-border); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+                {% endif %}
+                <div>
+                    <h6 class="fw-bold text-dark mb-0">{{ booking.vehicle.company_name }}</h6>
+                    <small class="text-muted">{{ booking.vehicle.car_model }}</small>
+                </div>
+            </div>
+
+            <!-- Route Timeline -->
+            <div class="d-flex flex-column gap-2 mb-3 bg-light p-3 rounded-3">
+                <div class="d-flex align-items-start gap-2">
+                    <span class="route-marker-start mt-1"></span>
+                    <span class="text-dark fw-semibold" style="font-size: 13px; word-break: break-word;"
+                        title="{{ booking.pickup_location }}">{{ booking.pickup_location }}</span>
+                </div>
+                <div class="d-flex align-items-start gap-2">
+                    <span class="route-marker-end mt-1"></span>
+                    <span class="text-muted" style="font-size: 13px; word-break: break-word;"
+                        title="{{ booking.drop_location }}">{{ booking.drop_location }}</span>
+                </div>
+            </div>
+
+            <!-- Details Block -->
+            <div class="row g-2 mb-3 text-center border-top border-bottom py-2">
+                <div class="col-4 border-end">
+                    <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase;">Date</small>
+                    <span class="fw-semibold text-dark" style="font-size: 13px;">{{ booking.booking_datetime|date:"d M Y" }}</span>
+                </div>
+                <div class="col-4 border-end">
+                    <small class="text-muted d-block"
+                        style="font-size: 10px; text-transform: uppercase;">Distance</small>
+                    <span class="fw-semibold text-dark" style="font-size: 13px;">{{ booking.distance }} KM</span>
+                </div>
+                <div class="col-4">
+                    <small class="text-muted d-block" style="font-size: 10px; text-transform: uppercase;">Total
+                        Fare</small>
+                    <span class="fw-bold text-success" style="font-size: 14px;">₹{% if booking.final_fare %}{{ booking.final_fare }}{% else %}{{ booking.total_fare }}{% endif %}</span>
+                </div>
+            </div>
+
+            <!-- Action Block -->
+            <div class="text-center mt-2">
+                {% if booking.status == "Pending" or booking.status == "Confirmed" %}
+                <a href="{% url 'cancel_booking' booking.id %}"
+                    class="btn btn-action-cancel w-100 d-flex align-items-center justify-content-center">
+                    Cancel Ride
+                </a>
+                {% elif booking.status == "Arrived" %}
+                <div class="p-2 bg-dark text-warning rounded-3 border fw-bold text-center">
+                    Your Ride OTP: {{ booking.ride_otp }}
+                </div>
+                {% elif booking.status == "Started" %}
+                <span class="text-success fw-bold">Ride In Progress...</span>
+                {% elif booking.status == "Completed" %}
+                {% if not booking.payment or booking.payment.status != "Paid" %}
+                {% if booking.payment and booking.payment.payment_method == "Cash" %}
+                <div class="p-2 bg-warning-subtle text-dark border rounded-3 fw-bold text-center mb-2"
+                    style="font-size: 13px;">
+                    <i class="bi bi-cash-stack me-1"></i> Cash Selected (Pay Cash to Driver)
+                </div>
+                <a href="{% url 'payment' booking.id %}" class="btn btn-sm btn-outline-success w-100 fw-bold">
+                    <i class="bi bi-credit-card me-1"></i> Pay via Razorpay instead
+                </a>
+                {% else %}
+                <div class="d-flex gap-2">
+                    <a href="{% url 'payment' booking.id %}" class="btn btn-success w-100 fw-bold">
+                        <i class="bi bi-credit-card me-1"></i> Razorpay
+                    </a>
+                    <a href="{% url 'pay_cash' booking.id %}" class="btn btn-outline-dark w-100 fw-bold">
+                        <i class="bi bi-cash me-1"></i> Cash
+                    </a>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="d-flex flex-column gap-2">
+                    <a href="{% url 'download_invoice' booking.id %}" class="btn btn-outline-primary w-100 fw-bold">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Download Invoice
+                    </a>
+                    {% if booking.review %}
+                    <span class="badge bg-success-subtle text-success border py-2">
+                        Reviewed ★ {{ booking.review.rating }}/5
+                    </span>
+                    {% else %}
+                    <a href="{% url 'add_review' booking.id %}" class="btn btn-warning w-100 fw-bold">
+                        ⭐ Rate &amp; Review Ride
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% elif booking.status == "Rejected" %}
+                <span class="badge bg-danger w-100 py-2">Driver Rejected</span>
+                {% elif booking.status == "Cancelled" %}
+                <span class="badge bg-secondary w-100 py-2">Ride Cancelled</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+
+    <div class="card booking-card">
+        <div class="card-body text-center py-5">
+            <div class="empty-icon-box mb-4">
+                <i class="bi bi-calendar-x"></i>
+            </div>
+            <h3 class="fw-bold text-dark">No Bookings Found</h3>
+            <p class="text-muted mb-4">You haven't booked any ride yet. Ready to travel?</p>
+            <a href="{% url 'available_cars' %}" class="btn btn-warning btn-lg">
+                🚖 Book Your First Ride
+            </a>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

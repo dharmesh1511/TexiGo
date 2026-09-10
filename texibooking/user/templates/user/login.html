@@ -1,0 +1,410 @@
+{% extends 'user/base.html' %}
+
+{% block title %}
+Login - TaxiGo
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .auth-wrapper {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 20px;
+        background: #f8fafc;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 460px;
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.10);
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+    }
+
+    .auth-header {
+        text-align: center;
+        padding: 35px 35px 20px;
+    }
+
+    .auth-logo {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 18px;
+        border-radius: 20px;
+        background: #2563EB;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        box-shadow: 0 12px 25px rgba(37, 99, 235, 0.25);
+    }
+
+    .auth-header h2 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        color: #0F172A;
+    }
+
+    .auth-header p {
+        margin-top: 8px;
+        margin-bottom: 0;
+        color: #64748B;
+        font-size: 14px;
+    }
+
+    .auth-body {
+        padding: 15px 35px 35px;
+    }
+
+    .alert-soft {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .form-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .input-ico {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-ico>i {
+        position: absolute;
+        left: 15px;
+        z-index: 2;
+        color: #64748B;
+        font-size: 17px;
+    }
+
+    .input-ico input {
+        width: 100%;
+        height: 52px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0 48px;
+        font-size: 15px;
+        color: #0F172A;
+        outline: none;
+        transition: 0.2s ease;
+        background: #ffffff;
+    }
+
+    .input-ico input:focus {
+        border-color: #2563EB;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    .pw-toggle {
+        position: absolute;
+        right: 12px;
+        border: 0;
+        background: transparent;
+        color: #64748B;
+        cursor: pointer;
+        font-size: 17px;
+        padding: 7px;
+        z-index: 3;
+    }
+
+    .pw-toggle:hover {
+        color: #2563EB;
+    }
+
+    .forgot-password-wrapper {
+        text-align: right;
+        margin-top: 9px;
+        margin-bottom: 22px;
+    }
+
+    .forgot-password {
+        color: #2563EB;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: 0.2s ease;
+    }
+
+    .forgot-password:hover {
+        color: #0F172A;
+        text-decoration: underline;
+    }
+
+    .btn-auth {
+        width: 100%;
+        padding: 9px 18px;
+        font-size: 14px;
+        min-height: 40px;
+        border: none;
+        border-radius: 8px;
+        background: #2563EB;
+        color: #ffffff;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+        box-shadow: 0 6px 14px rgba(37, 99, 235, 0.20);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-auth:hover {
+        background: #1D4ED8;
+        transform: translateY(-1px);
+        box-shadow: 0 14px 25px rgba(37, 99, 235, 0.25);
+    }
+
+    .auth-alt {
+        text-align: center;
+        margin-top: 24px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .auth-alt a {
+        color: #2563EB;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .auth-alt a:hover {
+        color: #111827;
+        text-decoration: underline;
+    }
+
+    @media (max-width: 576px) {
+
+        .auth-wrapper {
+            padding: 30px 15px;
+        }
+
+        .auth-card {
+            border-radius: 18px;
+        }
+
+        .auth-header {
+            padding: 30px 22px 15px;
+        }
+
+        .auth-body {
+            padding: 15px 22px 28px;
+        }
+
+        .auth-header h2 {
+            font-size: 24px;
+        }
+    }
+</style>
+
+
+<div class="auth-wrapper">
+
+    <div class="auth-card">
+
+        <!-- ==============================
+             HEADER
+        =============================== -->
+
+        <div class="auth-header">
+
+            <div class="auth-logo">
+                <i class="bi bi-car-front-fill"></i>
+            </div>
+
+            <h2>
+                Welcome Back
+            </h2>
+
+            <p>
+                Login to your TaxiGo account
+            </p>
+
+        </div>
+
+
+        <!-- ==============================
+             BODY
+        =============================== -->
+
+        <div class="auth-body">
+
+            <!-- Django Messages -->
+
+            {% if messages %}
+
+            {% for message in messages %}
+
+            <div class="alert-soft">
+
+                <i class="bi bi-info-circle-fill"></i>
+
+                <span>
+                    {{ message }}
+                </span>
+
+            </div>
+
+            {% endfor %}
+
+            {% endif %}
+
+
+            <!-- Login Form -->
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <!-- Username -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Username
+                    </label>
+
+                    <div class="input-ico">
+
+                        <i class="bi bi-person"></i>
+
+                        {{ form.username }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- Password -->
+
+                <div class="mb-2">
+
+                    <label class="form-label">
+                        Password
+                    </label>
+
+                    <div class="input-ico">
+
+                        <i class="bi bi-lock"></i>
+
+                        {{ form.password }}
+
+
+                        <!-- Password Toggle -->
+
+                        <button type="button" class="pw-toggle" onclick="togglePw(this)" aria-label="Show password">
+
+                            <i class="bi bi-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Forgot Password -->
+
+                <div class="forgot-password-wrapper">
+
+                    <a href="{% url 'forgot_password' %}" class="forgot-password">
+                        Forgot Password?
+                    </a>
+
+                </div>
+
+
+                <!-- Login Button -->
+
+                <button type="submit" class="btn-auth">
+                    <i class="bi bi-box-arrow-in-right me-1"></i>
+                    Login
+                </button>
+
+            </form>
+
+
+            <!-- Register -->
+
+            <div class="auth-alt">
+
+                Don't have an account?
+
+                <a href="{% url 'signup' %}">
+                    Register Now
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     PASSWORD TOGGLE
+================================ -->
+
+<script>
+
+    function togglePw(button) {
+
+        const input = button
+            .closest('.input-ico')
+            .querySelector('input');
+
+        const icon = button.querySelector('i');
+
+        if (input.type === "password") {
+
+            input.type = "text";
+
+            icon.classList.remove("bi-eye");
+
+            icon.classList.add("bi-eye-slash");
+
+            button.setAttribute(
+                "aria-label",
+                "Hide password"
+            );
+
+        } else {
+
+            input.type = "password";
+
+            icon.classList.remove("bi-eye-slash");
+
+            icon.classList.add("bi-eye");
+
+            button.setAttribute(
+                "aria-label",
+                "Show password"
+            );
+        }
+    }
+
+</script>
+
+{% endblock %}

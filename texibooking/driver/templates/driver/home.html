@@ -1,0 +1,418 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block title %}
+Become a Driver - TaxiGo
+{% endblock %}
+
+{% block content %}
+<style>
+    /*====================== DRIVER HOME SYSTEM ======================*/
+    :root {
+        --theme-green: #16A34A;
+        --theme-green-hover: #15803D;
+        --theme-black: #111827;
+        --theme-dark-gray: #1F2937;
+        --theme-light-gray: #F9FAFB;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 10px 30px rgba(17, 24, 39, 0.05);
+        --theme-shadow-lg: 0 20px 40px rgba(17, 24, 39, 0.08);
+    }
+
+    /* Hero */
+    .driver-hero {
+        background:
+            radial-gradient(600px circle at 90% -10%, rgba(37,99,235,.15) 0%, rgba(0,0,0,0) 60%),
+            linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        padding: 90px 0 80px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+    .driver-hero h1 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 52px;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.15;
+        color: #ffffff !important;
+    }
+    .driver-hero h1 span {
+        color: var(--theme-green);
+    }
+    .driver-hero p {
+        color: #94A3B8;
+        font-size: 18px;
+        line-height: 1.7;
+    }
+
+    /* Cards */
+    .feature-card, .process-card, .category-card {
+        border: 1px solid var(--theme-border) !important;
+        border-radius: 16px !important;
+        box-shadow: var(--theme-shadow) !important;
+        background-color: #ffffff;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+    }
+    .feature-card:hover, .process-card:hover, .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--theme-shadow-lg) !important;
+        border-color: var(--theme-green) !important;
+    }
+
+    .icon-box-p {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 24px;
+    }
+
+    /* Process number indicator */
+    .process-num {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: rgba(22, 163, 74, 0.08);
+        border: 1.5px solid rgba(22, 163, 74, 0.2);
+        color: var(--theme-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 18px;
+        margin: 0 auto 16px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* List group */
+    .doc-list .list-group-item {
+        border: 1px solid var(--theme-border) !important;
+        border-radius: 10px !important;
+        padding: 16px 20px;
+        margin-bottom: 8px;
+        background-color: #ffffff;
+        color: var(--theme-black);
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s ease;
+    }
+    .doc-list .list-group-item:hover {
+        transform: translateX(4px);
+        border-color: var(--theme-green) !important;
+    }
+    .doc-list .list-group-item i {
+        color: var(--theme-green);
+        font-size: 18px;
+    }
+
+    /* Buttons */
+    .btn-green-lg {
+        background-color: var(--theme-green) !important;
+        border-color: var(--theme-green) !important;
+        color: #ffffff !important;
+        padding: 9px 18px;
+        font-size: 14px;
+        min-height: 40px;
+        border-radius: 8px;
+        font-weight: 700;
+        box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+    }
+    .btn-green-lg:hover {
+        background-color: var(--theme-green-hover) !important;
+        border-color: var(--theme-green-hover) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(22, 163, 74, 0.35);
+    }
+
+    .btn-outline-light-lg {
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px;
+        padding: 9px 18px;
+        font-size: 14px;
+        min-height: 40px;
+        font-weight: 700;
+        color: #ffffff !important;
+    }
+    .btn-outline-light-lg:hover {
+        background-color: #ffffff !important;
+        color: var(--theme-black) !important;
+        transform: translateY(-2px);
+    }
+
+    .btn-dark-lg {
+        background-color: var(--theme-black) !important;
+        border-color: var(--theme-black) !important;
+        color: #ffffff !important;
+        padding: 9px 18px;
+        font-size: 14px;
+        min-height: 40px;
+        border-radius: 8px;
+        font-weight: 700;
+        box-shadow: 0 4px 14px rgba(17, 24, 39, 0.25);
+    }
+    .btn-dark-lg:hover {
+        background-color: #1f2937 !important;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive Styling Adjustments */
+    @media (max-width: 767.98px) {
+        .driver-hero {
+            padding: 50px 0 40px;
+        }
+        .driver-hero h1 {
+            font-size: 32px !important;
+        }
+        .driver-hero p {
+            font-size: 15px;
+        }
+        .btn-green-lg, .btn-outline-light-lg, .btn-dark-lg {
+            padding: 10px 20px;
+            font-size: 14px;
+            width: 100%;
+            text-align: center;
+        }
+        .d-flex.gap-3 {
+            flex-direction: column;
+            gap: 10px !important;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="driver-hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 text-lg-start text-center">
+                <span class="badge bg-primary bg-opacity-15 rounded-pill px-3 py-2 mb-3 text-white border border-primary border-opacity-25">
+                    <i class="bi bi-star-fill text-warning me-1"></i> Drive &amp; Earn
+                </span>
+                <h1>Become a <span>Taxi Driver</span></h1>
+                <p class="mt-3 mb-4">
+                    Join our premium booking network, drive when you want, and maximize your daily earnings. Register today and start accepting ride requests instantly.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-lg-start justify-content-center">
+                    <a href="{% url 'driver_register' %}" class="btn btn-green-lg">
+                        Register Now
+                    </a>
+                    <a href="{% url 'driver_login' %}" class="btn btn-outline-light-lg">
+                        Driver Login
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                {% if vehicle_image %}
+                    <img src="{{ vehicle_image }}" class="img-fluid" width="480">
+                {% else %}
+                    <img src="{% static 'driver/images/driver.png' %}" class="img-fluid" width="480" alt="Become a Driver">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="py-5 bg-white">
+    <div class="container py-4">
+        <h2 class="text-center fw-bold mb-2 text-dark" style="font-family: 'Poppins', sans-serif;">Why Join Us?</h2>
+        <p class="text-center text-muted mb-5">Earn attractively with maximum flexibility</p>
+        
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-lg-3 col-sm-6">
+                <div class="card feature-card text-center p-4">
+                    <div class="card-body">
+                        <div class="icon-box-p" style="background-color: rgba(22, 163, 74, 0.08); color: var(--theme-green);">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Daily Earnings</h5>
+                        <p class="text-muted small mb-0">Earn attractive income and get paid every day directly.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 2 -->
+            <div class="col-lg-3 col-sm-6">
+                <div class="card feature-card text-center p-4">
+                    <div class="card-body">
+                        <div class="icon-box-p" style="background-color: rgba(59, 130, 246, 0.08); color: #2563eb;">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Flexible Time</h5>
+                        <p class="text-muted small mb-0">Set your own hours. Work whenever matches your schedule.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 3 -->
+            <div class="col-lg-3 col-sm-6">
+                <div class="card feature-card text-center p-4">
+                    <div class="card-body">
+                        <div class="icon-box-p" style="background-color: rgba(245, 158, 11, 0.08); color: #d97706;">
+                            <i class="bi bi-car-front-fill"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">More Rides</h5>
+                        <p class="text-muted small mb-0">Receive nearby ride requests from passengers instantly.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 4 -->
+            <div class="col-lg-3 col-sm-6">
+                <div class="card feature-card text-center p-4">
+                    <div class="card-body">
+                        <div class="icon-box-p" style="background-color: rgba(17, 24, 39, 0.05); color: var(--theme-black);">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Driver Support</h5>
+                        <p class="text-muted small mb-0">Get 24x7 priority support whenever you need help on road.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Registration Process -->
+<section class="py-5" style="background-color: var(--theme-light-gray);">
+    <div class="container py-4">
+        <h2 class="text-center fw-bold mb-2 text-dark" style="font-family: 'Poppins', sans-serif;">Registration Process</h2>
+        <p class="text-center text-muted mb-5">Four simple steps to get you on the road</p>
+
+        <div class="row g-4 text-center">
+            <!-- Step 1 -->
+            <div class="col-lg-3 col-sm-6">
+                <div class="card process-card p-4">
+                    <div class="card-body">
+                        <div class="process-num">1</div>
+                        <h5 class="fw-bold text-dark mb-2">Create Account</h5>
+                        <p class="text-muted small mb-0">Register yourself as a certified driver.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Step 2 -->
+            <div class="col-lg-3 col-sm-6">
+                <div class="card process-card p-4">
+                    <div class="card-body">
+                        <div class="process-num">2</div>
+                        <h5 class="fw-bold text-dark mb-2">Add Vehicle</h5>
+                        <p class="text-muted small mb-0">Submit your vehicle parameters and details.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Step 3 -->
+            <div class="col-lg-3 col-sm-6">
+                <div class="card process-card p-4">
+                    <div class="card-body">
+                        <div class="process-num">3</div>
+                        <h5 class="fw-bold text-dark mb-2">Verification</h5>
+                        <p class="text-muted small mb-0">Admin verifies documents and approves.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Step 4 -->
+            <div class="col-lg-3 col-sm-6">
+                <div class="card process-card p-4">
+                    <div class="card-body">
+                        <div class="process-num">4</div>
+                        <h5 class="fw-bold text-dark mb-2">Start Driving</h5>
+                        <p class="text-muted small mb-0">Accept ride orders and start earning money.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Required Documents -->
+<section class="py-5 bg-white">
+    <div class="container py-4">
+        <h2 class="text-center fw-bold mb-2 text-dark" style="font-family: 'Poppins', sans-serif;">Required Documents</h2>
+        <p class="text-center text-muted mb-5">Keep these items ready during registration</p>
+
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="doc-list">
+                    <div class="list-group list-group-flush border-0">
+                        <div class="list-group-item border-0"><i class="bi bi-check-circle-fill"></i> Driving License</div>
+                        <div class="list-group-item border-0"><i class="bi bi-check-circle-fill"></i> Aadhaar Card</div>
+                        <div class="list-group-item border-0"><i class="bi bi-check-circle-fill"></i> PAN Card</div>
+                        <div class="list-group-item border-0"><i class="bi bi-check-circle-fill"></i> Vehicle RC Book</div>
+                        <div class="list-group-item border-0"><i class="bi bi-check-circle-fill"></i> Vehicle Insurance</div>
+                        <div class="list-group-item border-0"><i class="bi bi-check-circle-fill"></i> Vehicle Photo</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img src="{% static 'driver/images/car.png' %}" class="img-fluid" width="420" alt="Required Documents">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Vehicle Types -->
+<section class="py-5" style="background-color: var(--theme-light-gray);">
+    <div class="container py-4">
+        <h2 class="text-center fw-bold mb-2 text-dark" style="font-family: 'Poppins', sans-serif;">Vehicle Categories</h2>
+        <p class="text-center text-muted mb-5">Choose the class that matches your ride</p>
+
+        <div class="row g-4 text-center">
+            <!-- Mini -->
+            <div class="col-md-4">
+                <div class="card category-card p-4">
+                    <div class="card-body">
+                        <div class="icon-box-p" style="background-color: rgba(22, 163, 74, 0.08); color: var(--theme-green); font-size: 32px;">
+                            <i class="bi bi-car-front"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">Mini</h4>
+                        <p class="text-muted small mb-0">Compact, cost-effective drives best for quick city commuting.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Sedan -->
+            <div class="col-md-4">
+                <div class="card category-card p-4">
+                    <div class="card-body">
+                        <div class="icon-box-p" style="background-color: rgba(59, 130, 246, 0.08); color: #2563eb; font-size: 32px;">
+                            <i class="bi bi-car-front-fill"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">Sedan</h4>
+                        <p class="text-muted small mb-0">Premium interior comfort with spacious seating for family travel.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- SUV -->
+            <div class="col-md-4">
+                <div class="card category-card p-4">
+                    <div class="card-body">
+                        <div class="icon-box-p" style="background-color: rgba(245, 158, 11, 0.08); color: #d97706; font-size: 32px;">
+                            <i class="bi bi-truck-flatbed"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">SUV</h4>
+                        <p class="text-muted small mb-0">Large capacity SUVs perfect for long-distance and heavy baggage.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); position: relative; overflow: hidden;">
+    <div class="container text-center py-4">
+        <h2 class="fw-bold mb-2" style="font-family: 'Poppins', sans-serif; font-size: 36px; color: #ffffff !important;">Ready to Start Driving?</h2>
+        <p class="text-muted mb-4 fs-6" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+            Create your premium driver profile today, submit your documents, and start earning on your own terms.
+        </p>
+        <a href="{% url 'driver_register' %}" class="btn btn-green-lg">
+            Become a Driver
+        </a>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,530 @@
+{% extends "driver/base.html" %}
+
+{% block title %}
+Ride History - TaxiGo
+{% endblock %}
+
+{% block content %}
+<!-- Google Fonts (Poppins) and Custom Premium Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Scoped Wrapper Styling */
+    .dashboard-wrapper {
+        font-family: 'Poppins', sans-serif !important;
+        color: #111827;
+    }
+
+    /* Color Constants */
+    :root {
+        --theme-green: #2563EB;
+        --theme-green-hover: #1D4ED8;
+        --theme-black: #0F172A;
+        --theme-dark-gray: #0F172A;
+        --theme-light-gray: #F8FAFC;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+        --theme-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Page Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.1s; }
+    .delay-3 { animation-delay: 0.15s; }
+
+    /* Custom Navigation Breadcrumbs */
+    .custom-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .custom-breadcrumb a {
+        color: var(--theme-green);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .custom-breadcrumb a:hover {
+        color: #15803d;
+    }
+
+    /* Page Header */
+    .header-section {
+        margin-bottom: 2rem;
+    }
+    .header-section h2 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        color: var(--theme-black);
+        margin: 0;
+    }
+    .header-section p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+        margin-top: 0.25rem;
+    }
+
+    /* KPI Stats Cards */
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid var(--theme-border);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--theme-shadow);
+        height: 100%;
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--theme-shadow-lg) !important;
+        border-color: var(--theme-green);
+    }
+    .stat-icon-wrapper {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        transition: all 0.3s ease;
+    }
+    .stat-icon-green {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+    }
+    .stat-icon-black {
+        background-color: rgba(17, 24, 39, 0.06);
+        color: var(--theme-black);
+    }
+
+    /* Main Table Panel */
+    .premium-card {
+        background: #ffffff;
+        border: 1px solid var(--theme-border) !important;
+        border-radius: 18px !important;
+        box-shadow: var(--theme-shadow-lg) !important;
+        overflow: hidden;
+    }
+    .premium-card-header {
+        background: #ffffff !important;
+        border-bottom: 1px solid var(--theme-border) !important;
+        padding: 20px 24px !important;
+    }
+
+    /* Toolbar Utilities */
+    .search-wrapper {
+        position: relative;
+        max-width: 320px;
+    }
+    .search-wrapper .bi-search {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.95rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+    .search-input-premium {
+        padding-left: 44px;
+        height: 44px;
+        border-radius: 10px;
+        border: 1.5px solid var(--theme-border);
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background-color: var(--theme-light-gray);
+    }
+    .search-input-premium:focus {
+        background-color: #ffffff;
+        border-color: var(--theme-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+    }
+    .search-input-premium:focus + .bi-search {
+        color: var(--theme-green);
+    }
+
+    /* Premium Table layout */
+    .premium-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+    .premium-table thead th {
+        background-color: var(--theme-light-gray);
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 10px 10px;
+        border-bottom: 1px solid var(--theme-border);
+    }
+    .premium-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid var(--theme-border);
+    }
+    .premium-table tbody tr:hover {
+        background-color: rgba(22, 163, 74, 0.01) !important;
+    }
+    .premium-table td {
+        padding: 10px 10px;
+        color: #374151;
+        font-size: 14px;
+        border: none;
+    }
+
+    /* Table details styling */
+    .user-tag {
+        font-weight: 600;
+        color: var(--theme-black);
+    }
+    .date-text {
+        font-weight: 500;
+        color: #374151;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        font-weight: 600;
+        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 30px;
+        display: inline-block;
+    }
+    .status-badge.status-completed {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+        border: 1px solid rgba(22, 163, 74, 0.15);
+    }
+
+    /* Card Footer styling */
+    .premium-card-footer {
+        background: #ffffff;
+        border-top: 1px solid var(--theme-border);
+        padding: 20px 24px;
+    }
+
+    /* Empty state styling */
+    .empty-state-container {
+        padding: 64px 32px;
+        text-align: center;
+        background: #ffffff;
+        border: 1px solid var(--theme-border);
+        border-radius: 18px;
+        box-shadow: var(--theme-shadow);
+    }
+    .empty-state-icon {
+        font-size: 3.5rem;
+        color: var(--theme-green);
+        margin-bottom: 24px;
+        display: inline-block;
+    }
+    .empty-state-title {
+        font-weight: 700;
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+        color: var(--theme-black);
+    }
+    .empty-state-text {
+        color: #6b7280;
+        max-width: 420px;
+        margin: 0 auto;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+
+    /* Route markers */
+    .route-dot-start {
+        width: 8px;
+        height: 8px;
+        background-color: var(--theme-green);
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+    .route-dot-end {
+        width: 8px;
+        height: 8px;
+        background-color: #ef4444;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    /* Route Text Truncation */
+    .route-text {
+        max-width: 170px;
+        display: inline-block;
+    }
+
+    /* Responsive Styling Adjustments */
+    @media (max-width: 991.98px) {
+        .dashboard-wrapper {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+    }
+    
+    @media (max-width: 767.98px) {
+        .header-section {
+            margin-bottom: 1.5rem;
+        }
+        .header-section h2 {
+            font-size: 1.5rem;
+        }
+        .header-section p {
+            font-size: 0.85rem;
+        }
+        .stat-card {
+            padding: 16px;
+        }
+        .stat-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            font-size: 18px;
+        }
+        .premium-card-header {
+            padding: 16px 20px !important;
+        }
+        .premium-table thead th {
+            padding: 14px 16px;
+            font-size: 0.7rem;
+        }
+        .premium-table td {
+            padding: 14px 16px;
+            font-size: 13px;
+        }
+        .route-text {
+            max-width: 180px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .route-text {
+            max-width: 130px;
+        }
+    }
+</style>
+
+<div class="container-fluid py-3 dashboard-wrapper px-4">
+
+    <!-- Custom Navigation Breadcrumbs -->
+    <nav class="custom-breadcrumb animate-up" aria-label="breadcrumb">
+        <a href="{% url 'driver_dashboard' %}">Dashboard</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <span class="text-dark">Ride History</span>
+    </nav>
+
+    <!-- Page Header Section -->
+    <div class="header-section d-flex justify-content-between align-items-center animate-up delay-1">
+        <div>
+            <h2>📊 Ride History</h2>
+            <p>Review logs and historical records of all your completed trips</p>
+        </div>
+    </div>
+
+    {% if completed_rides %}
+        <!-- Dashboard Statistics Cards Row -->
+        <div class="row g-4 mb-4 animate-up delay-2">
+            <!-- Stat card: Completed Trips -->
+            <div class="col-12 col-md-4 col-12">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small fw-bold text-uppercase tracking-wider">Completed Rides</span>
+                            <h3 class="mb-0 mt-2 fw-bold text-dark">{{ total_completed }}</h3>
+                            <p class="text-success small mb-0 mt-2 fw-medium">
+                                <i class="bi bi-check-circle-fill me-1"></i> Successfully delivered
+                            </p>
+                        </div>
+                        <div class="stat-icon-wrapper stat-icon-green">
+                            <i class="bi bi-calendar-check-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat card: Service Rate -->
+            <div class="col-12 col-md-4 col-12">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small fw-bold text-uppercase tracking-wider">Service Rate</span>
+                            <h3 class="mb-0 mt-2 fw-bold text-dark">100%</h3>
+                            <p class="text-muted small mb-0 mt-2">
+                                Zero cancellation penalty
+                            </p>
+                        </div>
+                        <div class="stat-icon-wrapper stat-icon-black">
+                            <i class="bi bi-activity"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat card: Operations -->
+            <div class="col-12 col-md-4 col-12">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small fw-bold text-uppercase tracking-wider">Fleet Status</span>
+                            <h3 class="mb-0 mt-2 fw-bold text-success">Verified</h3>
+                            <p class="text-muted small mb-0 mt-2">
+                                Account in good standing
+                            </p>
+                        </div>
+                        <div class="stat-icon-wrapper stat-icon-green">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Card -->
+        <div class="card premium-card animate-up delay-3 border-0">
+            <!-- Card Header Control Toolbar -->
+            <div class="premium-card-header bg-white py-3 px-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                    
+                    <!-- Search Input -->
+                    <div class="search-wrapper w-100">
+                        <input type="text"
+                               id="searchInput"
+                               class="form-control search-input-premium"
+                               placeholder="Search customer, location, date...">
+                        <i class="bi bi-search"></i>
+                    </div>
+
+                    <!-- Statistics Indicator Badge -->
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted small fw-bold text-uppercase tracking-wider">Total Records</span>
+                        <span class="badge bg-dark px-3 py-1.5 rounded-3 fw-semibold">
+                            {{ total_completed }}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Table Block -->
+            <div class="table-responsive">
+                <table class="table premium-table align-middle text-center" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">#</th>
+                            <th>Customer</th>
+                            <th class="text-start">Route Journey</th>
+                            <th>Booking Date</th>
+                            <th style="width: 150px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ride in completed_rides %}
+                            <tr>
+                                <td class="fw-medium text-secondary">{{ forloop.counter }}</td>
+                                <td>
+                                    <span class="user-tag">{{ ride.user.username }}</span>
+                                </td>
+                                <td class="text-start" style="max-width: 190px;">
+                                    <div class="d-flex flex-column gap-2 py-1">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="route-dot-start"></span>
+                                            <span class="route-text text-truncate text-dark fw-semibold" title="{{ ride.pickup_location }}">{{ ride.pickup_location }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="route-dot-end"></span>
+                                            <span class="route-text text-truncate text-muted" title="{{ ride.drop_location }}">{{ ride.drop_location }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="d-block text-dark fw-medium">{{ ride.booking_datetime|date:"d M Y" }}</span>
+                                    <small class="text-muted">{{ ride.booking_datetime|time:"h:i A" }}</small>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-completed">
+                                        {{ ride.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                        <!-- Empty Search Row Placeholder -->
+                        <tr id="noResultsRow" style="display: none;">
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="bi bi-search mb-3" style="font-size: 2.5rem; color: #cbd5e1; display: block;"></i>
+                                    <h5 class="fw-bold text-dark">No matching rides found</h5>
+                                    <p class="small mb-0">Try checking spelling or adjusting keywords</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State UI -->
+        <div class="empty-state-container animate-up delay-2">
+            <div class="empty-state-icon">
+                <i class="bi bi-calendar-x"></i>
+            </div>
+            <h4 class="empty-state-title">No Completed Rides</h4>
+            <p class="empty-state-text">You don't have any completed ride records in your history yet. Complete active booking requests to build your profile logs.</p>
+        </div>
+    {% endif %}
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Instant Interactive Search Filter
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function() {
+            let value = this.value.toLowerCase().trim();
+            let rows = document.querySelectorAll("#historyTable tbody tr:not(#noResultsRow)");
+            let matches = 0;
+
+            rows.forEach(function(row) {
+                let text = row.innerText.toLowerCase();
+                if (text.includes(value)) {
+                    row.style.display = "";
+                    matches++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            let noResultsRow = document.getElementById("noResultsRow");
+            if (noResultsRow) {
+                noResultsRow.style.display = (matches === 0 && rows.length > 0) ? "" : "none";
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

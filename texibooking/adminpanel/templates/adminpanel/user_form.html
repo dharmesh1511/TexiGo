@@ -1,0 +1,334 @@
+{% extends 'adminpanel/base.html' %}
+
+{% block title %}
+Create User - TaxiGo Admin
+{% endblock %}
+
+{% block page %}
+Create User
+{% endblock %}
+
+{% block content %}
+<!-- Google Fonts (Poppins) and Custom Premium Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Scoped Wrapper Styling */
+    .dashboard-wrapper {
+        font-family: 'Poppins', sans-serif !important;
+        color: #111827;
+    }
+
+    /* Color Constants */
+    :root {
+        --theme-green: #16A34A;
+        --theme-black: #111827;
+        --theme-white: #ffffff;
+        --theme-gray-light: #f9fafb;
+        --theme-gray-border: #e5e7eb;
+    }
+
+    /* Page Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.1s; }
+
+    /* Custom Breadcrumbs */
+    .custom-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .custom-breadcrumb a {
+        color: var(--theme-green);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .custom-breadcrumb a:hover {
+        color: #15803d;
+    }
+
+    /* Page Header */
+    .header-section {
+        margin-bottom: 2rem;
+    }
+    .header-section h2 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        color: var(--theme-black);
+        margin: 0;
+    }
+    .header-section p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+        margin-top: 0.25rem;
+    }
+
+    /* Card Styling */
+    .premium-card {
+        background: var(--theme-white);
+        border: 1px solid var(--theme-gray-border) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 10px 30px rgba(17, 24, 39, 0.05) !important;
+        overflow: hidden;
+    }
+    .premium-card-header {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;
+        padding: 20px 24px !important;
+        border-bottom: 1px solid var(--theme-gray-border) !important;
+        border: none;
+    }
+    .premium-card-header h5 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff !important;
+        margin: 0;
+    }
+
+    /* Form Inputs Custom Styling */
+    .premium-form-card label {
+        font-weight: 600;
+        font-size: 0.825rem;
+        color: #374151;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: inline-block;
+    }
+
+    .premium-form-card input[type="text"],
+    .premium-form-card input[type="password"],
+    .premium-form-card input[type="email"],
+    .premium-form-card select,
+    .premium-form-card textarea {
+        display: block;
+        width: 100%;
+        height: 48px;
+        padding: 10px 16px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.5;
+        color: var(--theme-black);
+        background-color: var(--theme-white);
+        background-clip: padding-box;
+        border: 1.5px solid var(--theme-gray-border);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .premium-form-card input[type="text"]:focus,
+    .premium-form-card input[type="password"]:focus,
+    .premium-form-card input[type="email"]:focus,
+    .premium-form-card select:focus,
+    .premium-form-card textarea:focus {
+        background-color: var(--theme-white);
+        border-color: var(--theme-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+        outline: none;
+    }
+
+    /* Custom Alert Override */
+    .alert-success {
+        background-color: rgba(22, 163, 74, 0.05) !important;
+        border: none !important;
+        border-left: 4px solid var(--theme-green) !important;
+        color: var(--theme-black) !important;
+        border-radius: 12px !important;
+        padding: 16px 20px !important;
+        font-weight: 500;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important;
+        display: flex;
+        align-items: center;
+    }
+    .alert-success::before {
+        content: "\F272"; /* Bootstrap Icon code for check-circle-fill */
+        font-family: "bootstrap-icons";
+        margin-right: 12px;
+        font-size: 1.25rem;
+        color: var(--theme-green);
+    }
+
+    /* Error details text */
+    .errorlist, .text-danger {
+        list-style: none;
+        color: #dc2626;
+        padding-left: 0;
+        font-size: 0.775rem;
+        font-weight: 600;
+        margin-top: 6px;
+        margin-bottom: 0;
+        display: block;
+    }
+
+    /* Buttons Override */
+    .btn-theme-primary {
+        background: var(--theme-green);
+        color: var(--theme-white);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 8px 16px;
+        font-size: 14px;
+        min-height: 38px;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-theme-primary:hover {
+        background: #15803d;
+        color: var(--theme-white) !important;
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 14px rgba(22, 163, 74, 0.25);
+    }
+
+    .btn-theme-secondary {
+        background: #374151;
+        color: var(--theme-white);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 8px 16px;
+        font-size: 14px;
+        min-height: 38px;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 10px rgba(55, 65, 81, 0.15);
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .btn-theme-secondary:hover {
+        background: var(--theme-black);
+        color: var(--theme-white) !important;
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 14px rgba(17, 24, 39, 0.2);
+    }
+</style>
+
+<div class="container-fluid py-2 dashboard-wrapper px-4">
+
+    <!-- Breadcrumb -->
+    <nav class="custom-breadcrumb animate-up" aria-label="breadcrumb">
+        <a href="{% url 'admin_dashboard' %}">Admin</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <a href="{% url 'user_list' %}">User Management</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <span class="text-dark">Create User</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="header-section animate-up delay-1">
+        <h2>👤 Create New User</h2>
+        <p>Register and establish a new user account profile in the database system</p>
+    </div>
+
+    <!-- Form Section -->
+    <div class="row justify-content-center animate-up delay-2">
+        <div class="col-lg-8">
+
+            <div class="card premium-card premium-form-card border-0">
+                <!-- Card Header -->
+                <div class="premium-card-header d-flex align-items-center">
+                    <i class="bi bi-person-fill-add me-2 fs-5 text-success"></i>
+                    <h5 class="mb-0">User Information Form</h5>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4 p-lg-5">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" style="border-radius: 10px;">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" id="userAddForm">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <!-- Username -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Username</label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <small class="text-danger">
+                                        <i class="bi bi-exclamation-circle-fill me-1"></i> {{ form.username.errors|striptags }}
+                                    </small>
+                                {% endif %}
+                            </div>
+
+                            <!-- Email Address -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Email Address</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <small class="text-danger">
+                                        <i class="bi bi-exclamation-circle-fill me-1"></i> {{ form.email.errors|striptags }}
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Password -->
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label">Password</label>
+                                {{ form.password }}
+                                {% if form.password.errors %}
+                                    <small class="text-danger">
+                                        <i class="bi bi-exclamation-circle-fill me-1"></i> {{ form.password.errors|striptags }}
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-3 pt-4 border-top d-flex justify-content-between">
+                            <a href="{% url 'user_list' %}" class="btn btn-theme-secondary">
+                                <i class="bi bi-arrow-left me-2"></i> Back to List
+                            </a>
+
+                            <button type="submit" class="btn btn-theme-primary">
+                                <i class="bi bi-floppy-fill me-2"></i> Save User
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("#userAddForm input").forEach(function(el){
+            if(!el.classList.contains("form-control")){
+                el.classList.add("form-control");
+            }
+        });
+    });
+</script>
+{% endblock %}

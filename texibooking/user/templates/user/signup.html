@@ -1,0 +1,309 @@
+{% extends 'user/base.html' %}
+
+{% block title %}
+User Registration - TaxiGo
+{% endblock %}
+
+{% block content %}
+<style>
+    /*====================== AUTH SIGNUP SYSTEM ======================*/
+    :root {
+        --theme-green: #2563EB;
+        --theme-green-hover: #1D4ED8;
+        --theme-black: #0F172A;
+        --theme-dark-gray: #0F172A;
+        --theme-light-gray: #F8FAFC;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+        --theme-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .auth-wrap {
+        min-height: calc(100vh - 82px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 16px;
+        background:
+            radial-gradient(600px circle at 85% 15%, rgba(22, 163, 74, 0.12) 0%, rgba(0, 0, 0, 0) 55%),
+            linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 560px;
+        background: #ffffff;
+        border-radius: 20px !important;
+        box-shadow: var(--theme-shadow-lg) !important;
+        border: 1px solid var(--theme-border) !important;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .auth-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .auth-head {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        color: #fff;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .auth-badge {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        margin: 0 auto 20px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--theme-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .auth-head h3 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
+        margin: 0;
+        color: #fff;
+        font-size: 26px;
+        letter-spacing: -1px;
+    }
+
+    .auth-head p {
+        margin: 6px 0 0;
+        opacity: .7;
+        font-size: 14px;
+    }
+
+    .auth-body {
+        padding: 40px;
+    }
+
+    .auth-body label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--theme-dark-gray);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* Input Fields */
+    .auth-body .form-control,
+    .auth-body input,
+    .auth-body select {
+        width: 100%;
+        border: 1.5px solid var(--theme-border);
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: var(--theme-black);
+        transition: all 0.2s ease;
+    }
+
+    .auth-body .form-control:focus,
+    .auth-body input:focus,
+    .auth-body select:focus {
+        border-color: var(--theme-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12) !important;
+        outline: none !important;
+    }
+
+    /* Icon Input Group */
+    .input-ico {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .input-ico .ig-text {
+        background-color: var(--theme-light-gray);
+        border: 1.5px solid var(--theme-border);
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        color: var(--theme-green);
+    }
+
+    .input-ico input,
+    .input-ico .form-control {
+        border-radius: 0 10px 10px 0 !important;
+    }
+
+    /* Action Buttons */
+    .btn-auth {
+        background-color: var(--theme-green);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 8px;
+        padding: 9px 18px;
+        font-weight: 700;
+        font-size: 14px;
+        min-height: 40px;
+        width: 100%;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-auth:hover {
+        background-color: var(--theme-green-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.25);
+    }
+
+    .auth-alt {
+        font-size: 13px;
+        color: #6b7280;
+        text-align: center;
+    }
+
+    .auth-alt a {
+        color: var(--theme-green);
+        text-decoration: none;
+        font-weight: 700;
+        transition: color 0.15s ease;
+    }
+
+    .auth-alt a:hover {
+        color: var(--theme-green-hover);
+    }
+
+    img.preview {
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #ffffff;
+        box-shadow: var(--theme-shadow);
+        display: none;
+        margin: 0 auto 20px;
+        transition: all 0.3s ease;
+    }
+
+    img.preview:hover {
+        transform: scale(1.03);
+    }
+</style>
+
+<div class="auth-wrap">
+    <div class="auth-card">
+
+        <!-- Header -->
+        <div class="auth-head">
+            <div class="auth-badge">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+            <h3>User Registration</h3>
+            <p>Create your account to continue</p>
+        </div>
+
+        <div class="auth-body">
+            <!-- Messages -->
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4">
+                <i class="bi bi-check-circle-fill me-1"></i> {{ message }}
+                <button class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% if form.errors %}
+            <div class="alert alert-danger shadow-sm mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ form.errors }}
+            </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Profile Preview Box -->
+                <div class="text-center">
+                    <img id="preview" class="preview" alt="Profile preview">
+                </div>
+
+                <!-- Username -->
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <div class="input-ico">
+                        <span class="ig-text"><i class="bi bi-person-fill"></i></span>
+                        {{ form.username }}
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-ico">
+                        <span class="ig-text"><i class="bi bi-envelope-fill"></i></span>
+                        {{ form.email }}
+                    </div>
+                </div>
+
+                <!-- Profile Image -->
+                <div class="mb-3">
+                    <label class="form-label">Profile Image</label>
+                    <div class="input-ico">
+                        <span class="ig-text"><i class="bi bi-image-fill"></i></span>
+                        {{ form.profile_image }}
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-ico">
+                        <span class="ig-text"><i class="bi bi-lock-fill"></i></span>
+                        {{ form.password1 }}
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-4">
+                    <label class="form-label">Confirm Password</label>
+                    <div class="input-ico">
+                        <span class="ig-text"><i class="bi bi-shield-lock-fill"></i></span>
+                        {{ form.password2 }}
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <button type="submit" class="btn-auth">
+                    <i class="bi bi-person-check-fill me-1"></i> Register
+                </button>
+            </form>
+
+            <hr class="my-4" style="border-color: var(--theme-border);">
+
+            <div class="auth-alt">
+                Already have an account? <a href="{% url 'login' %}">Login Here</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".auth-body input, .auth-body select").forEach(function (el) {
+            el.classList.add("form-control");
+        });
+        const imageInput = document.getElementById("id_profile_image");
+        const preview = document.getElementById("preview");
+        if (imageInput) {
+            imageInput.onchange = function (e) {
+                const file = e.target.files[0];
+                if (file) { preview.src = URL.createObjectURL(file); preview.style.display = "block"; }
+            };
+        }
+    });
+</script>
+{% endblock %}

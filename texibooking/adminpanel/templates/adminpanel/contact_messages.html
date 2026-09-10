@@ -1,0 +1,375 @@
+{% extends 'adminpanel/base.html' %}
+
+{% block title %}
+Contact Messages - TaxiGo Admin
+{% endblock %}
+
+{% block content %}
+<!-- Google Fonts (Poppins & Inter) and Custom Premium Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* Scoped Wrapper Styling */
+    .dashboard-wrapper {
+        font-family: 'Inter', sans-serif !important;
+        color: #1f2937;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Color Constants */
+    :root {
+        --theme-green: #16A34A;
+        --theme-green-hover: #15803D;
+        --theme-black: #111827;
+        --theme-dark-gray: #1F2937;
+        --theme-white: #ffffff;
+        --theme-gray-light: #f9fafb;
+        --theme-gray-border: #e5e7eb;
+    }
+
+    /* Page Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+    }
+
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.1s; }
+    .delay-3 { animation-delay: 0.15s; }
+
+    /* Custom Navigation Breadcrumbs */
+    .custom-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .custom-breadcrumb a {
+        color: var(--theme-green);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .custom-breadcrumb a:hover {
+        color: var(--theme-green-hover);
+    }
+
+    /* Page Header */
+    .header-section {
+        margin-bottom: 2rem;
+    }
+    .header-section h2 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        color: var(--theme-black);
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+    .header-section p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+        margin-top: 0.25rem;
+    }
+
+    /* KPI Stats Card Widgets */
+    .stat-card-premium {
+        background: var(--theme-white);
+        border: 1px solid var(--theme-gray-border);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .stat-card-premium:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -4px rgba(17, 24, 39, 0.08);
+        border-color: var(--theme-green);
+    }
+    .stat-card-premium .stat-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+    .stat-card-premium .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--theme-black);
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+    .stat-icon-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+    .stat-card-premium:hover .stat-icon-box {
+        transform: scale(1.1);
+    }
+
+    .icon-box-green {
+        background-color: rgba(22, 163, 74, 0.08);
+        color: var(--theme-green);
+    }
+
+    /* Main Table Panel */
+    .premium-card {
+        background: var(--theme-white);
+        border: 1px solid var(--theme-gray-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        overflow: hidden;
+    }
+    .premium-card-header {
+        background: #ffffff !important;
+        border-bottom: 1px solid var(--theme-gray-border) !important;
+        padding: 20px 24px;
+        border: none;
+    }
+    .premium-card-header h5 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--theme-black);
+    }
+
+    /* Toolbar Utilities */
+    .search-wrapper {
+        position: relative;
+        max-width: 320px;
+    }
+    .search-wrapper .bi-search {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.95rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+    .search-input-premium {
+        padding-left: 44px;
+        height: 44px;
+        border-radius: 10px;
+        border: 1.5px solid var(--theme-gray-border);
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background-color: var(--theme-gray-light);
+    }
+    .search-input-premium:focus {
+        background-color: var(--theme-white);
+        border-color: var(--theme-green) !important;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+    }
+    .search-input-premium:focus + .bi-search {
+        color: var(--theme-green);
+    }
+
+    /* Premium Table layout */
+    .premium-table {
+        margin-bottom: 0;
+    }
+    .premium-table thead th {
+        background-color: var(--theme-gray-light);
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--theme-gray-border);
+    }
+    .premium-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid var(--theme-gray-border);
+    }
+    .premium-table tbody tr:hover {
+        background-color: rgba(22, 163, 74, 0.01) !important;
+    }
+    .premium-table td {
+        padding: 10px 8px;
+        color: #374151;
+        font-size: 0.875rem;
+        border: none;
+        vertical-align: middle;
+    }
+
+    .msg-text {
+        font-size: 0.825rem;
+        color: #4b5563;
+        max-width: 250px;
+        word-wrap: break-word;
+        text-align: left;
+    }
+
+    /* Footer styling */
+    .premium-card-footer {
+        background: var(--theme-white);
+        border-top: 1px solid var(--theme-gray-border);
+        padding: 20px 24px;
+    }
+</style>
+
+<div class="container-fluid py-2 dashboard-wrapper px-4">
+
+    <!-- Custom Navigation Breadcrumbs -->
+    <nav class="custom-breadcrumb animate-up" aria-label="breadcrumb">
+        <a href="{% url 'admin_dashboard' %}">Admin</a>
+        <i class="bi bi-chevron-right" style="font-size: 0.65rem;"></i>
+        <span class="text-dark">Contact Messages</span>
+    </nav>
+
+    <!-- Page Header Section -->
+    <div class="header-section d-flex justify-content-between align-items-center animate-up delay-1">
+        <div>
+            <h2>✉️ Contact Messages</h2>
+            <p>Monitor and respond to customer queries and contact submissions</p>
+        </div>
+    </div>
+
+    <!-- Summary Statistics Grid -->
+    <div class="row g-4 mb-4 animate-up delay-2">
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="stat-card-premium">
+                <div>
+                    <div class="stat-title">Total Messages</div>
+                    <h3 class="stat-number">{{ contacts|length }}</h3>
+                </div>
+                <div class="stat-icon-box icon-box-green">
+                    <i class="bi bi-envelope-open-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Panel -->
+    <div class="card premium-card animate-up delay-3 border-0">
+        <!-- Card Header Control Toolbar -->
+        <div class="premium-card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h5 class="mb-0">Inbox Registry</h5>
+            <div class="search-wrapper w-100 w-sm-50">
+                <input type="text"
+                       id="searchInput"
+                       class="form-control search-input-premium"
+                       placeholder="Filter by name, email, query...">
+                <i class="bi bi-search"></i>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            {% if contacts %}
+                <div class="table-responsive">
+                    <table class="table premium-table align-middle text-center" id="contactsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Subject</th>
+                                <th class="text-start">Message</th>
+                                <th style="width: 180px;">Date Received</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in contacts %}
+                                <tr>
+                                    <td class="fw-medium text-secondary">{{ forloop.counter }}</td>
+                                    <td class="fw-bold text-dark">{{ contact.full_name }}</td>
+                                    <td>{{ contact.email }}</td>
+                                    <td class="fw-semibold text-dark">{{ contact.subject }}</td>
+                                    <td class="text-start">
+                                        <div class="msg-text">{{ contact.message }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium text-dark">{{ contact.created_at|date:"d M Y" }}</span>
+                                        <br>
+                                        <small class="text-muted">{{ contact.created_at|time:"h:i A" }}</small>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            
+                            <!-- Empty Search Row Placeholder -->
+                            <tr id="noResultsRow" style="display: none;">
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-search mb-3 text-secondary" style="font-size: 2.5rem; display: block;"></i>
+                                        <h5 class="fw-bold text-dark">No matching messages found</h5>
+                                        <p class="small mb-0">Try typing a different name or keyword</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-mailbox mb-2 text-secondary" style="font-size: 2.5rem; display: block;"></i>
+                    <h5 class="fw-bold text-dark">No Messages Found</h5>
+                    <p class="small mb-0">Platform queries sent by guests will show up here</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Instant Interactive Search Filtering
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function() {
+            let value = this.value.toLowerCase().trim();
+            let rows = document.querySelectorAll("#contactsTable tbody tr:not(#noResultsRow)");
+            let matches = 0;
+
+            rows.forEach(function(row) {
+                let text = row.innerText.toLowerCase();
+                if (text.includes(value)) {
+                    row.style.display = "";
+                    matches++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            let noResultsRow = document.getElementById("noResultsRow");
+            if (noResultsRow) {
+                noResultsRow.style.display = (matches === 0 && rows.length > 0) ? "" : "none";
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

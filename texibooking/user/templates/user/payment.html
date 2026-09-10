@@ -1,0 +1,299 @@
+{% extends 'user/base.html' %}
+
+{% block title %}
+Payment - TaxiGo
+{% endblock %}
+
+{% block content %}
+<style>
+    /*====================== PAYMENT WINDOW SYSTEM ======================*/
+    :root {
+        --theme-green: #2563EB;
+        --theme-green-hover: #1D4ED8;
+        --theme-black: #0F172A;
+        --theme-dark-gray: #0F172A;
+        --theme-light-gray: #F8FAFC;
+        --theme-border: #E5E7EB;
+        --theme-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+        --theme-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .pay-wrap {
+        min-height: calc(100vh - 82px);
+        padding: 80px 16px;
+        background:
+            radial-gradient(500px circle at 80% 0%, rgba(22, 163, 74, 0.12) 0%, rgba(0, 0, 0, 0) 60%),
+            var(--theme-light-gray);
+    }
+
+    .pay-card {
+        max-width: 520px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 20px !important;
+        overflow: hidden;
+        box-shadow: var(--theme-shadow-lg) !important;
+        border: 1px solid var(--theme-border) !important;
+        transition: all 0.3s ease;
+    }
+
+    .pay-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .pay-head {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        color: #fff;
+        text-align: center;
+        padding: 40px;
+    }
+
+    .pay-head .p-ico {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        margin: 0 auto 20px;
+        background: rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: var(--theme-green);
+    }
+
+    .pay-head h3 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
+        margin: 0;
+        color: #fff;
+        font-size: 26px;
+        letter-spacing: -1px;
+    }
+
+    .pay-head p {
+        margin: 6px 0 0;
+        opacity: .7;
+        font-size: 14px;
+    }
+
+    .pay-vehicle-img {
+        height: 180px;
+        width: 100%;
+        object-fit: contain;
+        border-radius: 12px;
+        background-color: #ffffff;
+        border: 1px solid var(--theme-border);
+        padding: 10px;
+        margin-bottom: 24px;
+    }
+
+    /* Billing Row styles */
+    .pay-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 14px 0;
+        border-bottom: 1px dashed var(--theme-border);
+        font-size: 14px;
+    }
+
+    .pay-row:last-child {
+        border-bottom: none;
+    }
+
+    .pay-row .lbl {
+        color: #6b7280;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .pay-row .val {
+        color: var(--theme-black);
+        font-weight: 600;
+        text-align: right;
+        max-width: 65%;
+    }
+
+    .pay-total {
+        background: rgba(22, 163, 74, 0.05);
+        border: 1px solid rgba(22, 163, 74, 0.15);
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .pay-total .lbl {
+        font-weight: 700;
+        color: var(--theme-black);
+    }
+
+    .pay-total .amt {
+        font-weight: 800;
+        font-size: 26px;
+        color: var(--theme-green);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    #pay-btn {
+        background-color: var(--theme-green);
+        border: none;
+        border-radius: 10px;
+        padding: 15px;
+        font-weight: 700;
+        font-size: 16px;
+        width: 100%;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+        transition: all 0.2s ease;
+    }
+
+    #pay-btn:hover {
+        background-color: var(--theme-green-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.25);
+    }
+
+    .secure-note {
+        font-size: 12px;
+        color: #6b7280;
+        text-align: center;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .secure-note i {
+        color: var(--theme-green);
+        font-size: 14px;
+    }
+</style>
+
+<div class="pay-wrap">
+    <div class="pay-card">
+
+        <!-- Header -->
+        <div class="pay-head">
+            <div class="p-ico">
+                <i class="bi bi-credit-card-2-front-fill"></i>
+            </div>
+            <h3>TaxiGo Payment</h3>
+            <p>Complete your booking payment securely</p>
+        </div>
+
+        <div class="p-4 p-lg-5">
+            {% csrf_token %}
+
+            <!-- Car Photo -->
+            {% if booking.vehicle.car_image %}
+            <img src="{{ booking.vehicle.car_image.url }}" class="pay-vehicle-img"
+                alt="{{ booking.vehicle.company_name }}">
+            {% endif %}
+
+            <!-- Title Info -->
+            <div class="text-center mb-4">
+                <h4 class="fw-bold mb-0 text-dark" style="font-family: 'Poppins', sans-serif;">
+                    {{ booking.vehicle.company_name }}
+                </h4>
+                <p class="text-muted mb-0" style="font-size: 14px;">
+                    {{ booking.vehicle.car_model }}
+                </p>
+            </div>
+
+            <!-- Billing Details -->
+            <div class="my-4">
+                <div class="pay-row">
+                    <span class="lbl"><i class="bi bi-geo-alt-fill text-success"></i> Pickup</span>
+                    <span class="val">{{ booking.pickup_location }}</span>
+                </div>
+                <div class="pay-row">
+                    <span class="lbl"><i class="bi bi-geo-alt-fill text-danger"></i> Drop</span>
+                    <span class="val">{{ booking.drop_location }}</span>
+                </div>
+                <div class="pay-row">
+                    <span class="lbl"><i class="bi bi-signpost-2-fill text-dark"></i> Distance</span>
+                    <span class="val">{{ booking.distance }} KM</span>
+                </div>
+            </div>
+
+            <!-- Total Fare -->
+            <div class="pay-total mb-4">
+                <span class="lbl">Final Amount</span>
+                <span class="amt">₹{% if booking.final_fare %}{{ booking.final_fare }}{% else %}{{ booking.total_fare }}{% endif %}</span>
+            </div>
+
+            <!-- Action Buttons: Razorpay & Cash -->
+            <div class="d-flex flex-column gap-3">
+                <button id="pay-btn" class="btn btn-success py-3 fw-bold rounded-3 shadow-sm text-white">
+                    <i class="bi bi-credit-card-2-front-fill me-2"></i> Pay with Razorpay
+                </button>
+
+                <a href="{% url 'pay_cash' booking.id %}"
+                    class="btn btn-outline-dark py-3 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-cash-stack fs-5"></i> Pay with Cash (to Driver)
+                </a>
+            </div>
+
+            <!-- Secure Details -->
+            <p class="secure-note">
+                <i class="bi bi-shield-check"></i> Secured by Razorpay &bull; 256-bit encryption
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    var options = {
+        key: "{{ key }}",
+        amount: "{{ order.amount }}",
+        currency: "INR",
+        name: "TaxiGo",
+        description: "Cab Booking Payment",
+        image: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png",
+        order_id: "{{ order.id }}",
+        theme: { color: "#16A34A" },
+        modal: {
+            ondismiss: function () { alert("Payment Cancelled"); }
+        },
+        handler: function (response) {
+            fetch("{% url 'payment_success' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrftoken,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status == "success") {
+                        alert("Payment Successful");
+                        window.location = "{% url 'my_bookings' %}";
+                    } else {
+                        alert("Payment Failed");
+                    }
+                });
+        }
+    };
+
+    var rzp = new Razorpay(options);
+
+    document.getElementById("pay-btn").onclick = function (e) {
+        rzp.open();
+        e.preventDefault();
+    };
+</script>
+{% endblock %}

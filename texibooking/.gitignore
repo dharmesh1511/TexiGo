@@ -1,0 +1,55 @@
+gitignore id="7v0xkl"
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Environment Variables
+.env
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+
+# Media Files
+media/
+
+# Static Files (Optional)
+staticfiles/
+
+# Migrations (Keep __init__.py)
+**/migrations/*
+!**/migrations/__init__.py
+
+# IDE
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Test & Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Build Files
+build/
+dist/
+*.egg-info/
+
+# MyPy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# PyCharm
+*.iml
